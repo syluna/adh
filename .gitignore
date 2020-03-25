@@ -5,7 +5,7 @@
 *.log
 
 # Grade
-.grable
+.gradle
 gradle/
 
 # Build directory
