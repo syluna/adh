@@ -8,7 +8,7 @@
     <useControls filename="Interface/adh-controls/adh-chat-control.xml"/>
     <useStyles filename="Interface/adh-controls/adh-chat-styles.xml"/>
     <screen id="start" controller="fr.adh.client.gui.StartScreenController">
-        <layer id="background" backgroundColor="#000F" />
+        <!--<layer id="background" backgroundColor="#000F" />-->
         <!--layer id="layer" childLayout="center">
             <text font="aurulent-sans-16.fnt" color="#ffff" text="${itf.hello}" wrap="true" />
         </layer-->            

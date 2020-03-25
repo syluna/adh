@@ -143,13 +143,13 @@ public class AdHClient extends SimpleApplication implements ClientStateListener,
         createConnection();
         
         setupKeys();
-        //createTerrain();
+        createTerrain();
     }
 
     @Override
     public void simpleUpdate(float tpf) {
         super.simpleUpdate(tpf);
-/*
+
         time += tpf;
         waterHeight = (float) Math.cos(((time * 0.6f) % FastMath.TWO_PI)) * 1.5f;
         water.setWaterHeight(initialWaterHeight + waterHeight);
@@ -189,7 +189,6 @@ public class AdHClient extends SimpleApplication implements ClientStateListener,
         }
         player.setWalkDirection(walkDirection);
         player.setViewDirection(viewDirection);
-*/
     }
 
     @Override
@@ -434,8 +433,7 @@ public class AdHClient extends SimpleApplication implements ClientStateListener,
                 new KeyTrigger(KeyInput.KEY_S),
                 new KeyTrigger(KeyInput.KEY_DOWN));
         inputManager.addMapping("Jump",
-                new KeyTrigger(KeyInput.KEY_SPACE),
-                new KeyTrigger(KeyInput.KEY_RETURN));
+                new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addMapping("Shoot",
                 new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addListener(this, "Strafe Left", "Strafe Right");
@@ -474,7 +472,7 @@ public class AdHClient extends SimpleApplication implements ClientStateListener,
 
     @Override
     public void onAction(String binding, boolean value, float tpf) {
-        if (binding == null || "true".equals("true")) {
+        if (binding == null) {
             return;
         }
         switch (binding) {
