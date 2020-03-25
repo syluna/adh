@@ -3,7 +3,6 @@ package fr.adh.server;
 import com.jme3.app.SimpleApplication;
 import com.jme3.network.ConnectionListener;
 import com.jme3.network.HostedConnection;
-import com.jme3.network.Message;
 import com.jme3.network.Network;
 import com.jme3.network.Server;
 import com.jme3.network.serializing.Serializer;
@@ -15,11 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-/**
- * Main Server Class
- *
- * @author Jerome Vollerin
- */
 public class AdhServer extends SimpleApplication implements ConnectionListener  {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdhServer.class);
@@ -66,8 +60,7 @@ public class AdhServer extends SimpleApplication implements ConnectionListener  
     @Override
     public void connectionAdded(Server server, HostedConnection con) {
         LOGGER.info("Client id [{}] from [{}] is now connected.", con.getId(), con.getAddress());
-        Message msg = new ShutdownServerMessage("toto");
-        server.broadcast(msg);
+        server.broadcast(new ShutdownServerMessage("Closing for maintenance in few minutes."));
     }
 
     @Override

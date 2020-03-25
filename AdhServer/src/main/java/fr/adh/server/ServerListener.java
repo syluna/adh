@@ -21,7 +21,6 @@ public class ServerListener implements MessageListener<HostedConnection> {
     @Override
     public void messageReceived(HostedConnection source, Message message) {
         if (message instanceof ChatMessage) {
-            // do something with the message
             ChatMessage chatMsg = (ChatMessage) message;
             LOGGER.info("Chat message received from [{}] and broadcast content [{}].", source.getId(), chatMsg.getMessage());
             server.broadcast(chatMsg);

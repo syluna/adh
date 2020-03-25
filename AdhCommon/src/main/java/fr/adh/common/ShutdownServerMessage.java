@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class ShutdownServerMessage extends AbstractMessage {
 
     @Getter
-    private String hello;
+    private String reason;
 
 }

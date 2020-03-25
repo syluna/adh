@@ -15,9 +15,9 @@ public class ClientMessageListener implements MessageListener<Client> {
     @Override
     public void messageReceived(Client client, Message message) {
         if(message instanceof ShutdownServerMessage){
-            LOGGER.warn("Shutdown server message receive [{}]", ((ShutdownServerMessage)message).getHello());
             ShutdownServerMessage msg = (ShutdownServerMessage) message;
-            AdHClient.getInstance().getStartScreenController().onSystemMessageReceived(msg.getHello());
+            LOGGER.warn("Shutdown server message receive [{}]", msg.getReason());
+            AdHClient.getInstance().getStartScreenController().onSystemMessageReceived(msg.getReason());
         } else if(message instanceof ChatMessage){
             ChatMessage msg = (ChatMessage) message;
             AdHClient.getInstance().getStartScreenController().onMessageReceived(msg.getPlayerName(), msg.getMessage());
