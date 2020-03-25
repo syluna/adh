@@ -1,0 +1,84 @@
+plugins {
+    id 'application'
+    id 'java'
+}
+apply from: '../build.gradle'
+
+description = 'AdH Client'
+
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) { // compile-time options:
+        options.compilerArgs << '-Xdiags:verbose'
+        options.compilerArgs << '-Xlint:unchecked'
+        options.deprecation = true
+        options.encoding = 'UTF-8'
+    }
+    tasks.withType(JavaExec) { // runtime options:
+        args = []
+        classpath sourceSets.main.runtimeClasspath
+        //debug true
+        enableAssertions true
+        //jvmArgs '-verbose:gc'
+        //jvmArgs '-Xbatch'
+        //jvmArgs '-Xms512m', '-Xmx512m'
+        //jvmArgs '-XX:+PrintCompilation'
+        //jvmArgs '-XX:+UseConcMarkSweepGC'
+        jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
+    }
+}
+
+// NetBeans will automatically add "run" and "debug" tasks relying on the
+// "mainClass" property. You may however define the property prior executing
+// tasks by passing a "-PmainClass=<QUALIFIED_CLASS_NAME>" argument.
+mainClassName = 'fr.adh.client.AdHClient'
+if (!hasProperty('mainClass')) {
+    ext.mainClass = mainClassName
+}
+jar.manifest.attributes('Main-Class': mainClassName)
+
+dependencies {
+    implementation project(':AdhCommon')
+    
+    runtimeOnly files('libs/nifty-examples-1.4.1.jar')
+    runtimeOnly fileTree(dir: 'libs', include: '*.jar')
+    // You can read more about how to add dependencies here:
+    //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
+
+    implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion + ':sources'
+    implementation 'org.jmonkeyengine:jme3-bullet:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-bullet:' + jmeVersion + ':sources'
+    runtimeOnly 'org.jmonkeyengine:jme3-bullet-native:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-desktop:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-desktop:' + jmeVersion + ':sources'
+    implementation 'org.jmonkeyengine:jme3-effects:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-effects:' + jmeVersion + ':sources'
+    implementation 'org.jmonkeyengine:jme3-jogl:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-jogl:' + jmeVersion + ':sources'
+    implementation 'org.jmonkeyengine:jme3-networking:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-networking:' + jmeVersion + ':sources'
+    implementation 'org.jmonkeyengine:jme3-niftygui:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-niftygui:' + jmeVersion + ':sources'
+    implementation 'org.jmonkeyengine:jme3-terrain:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-terrain:' + jmeVersion + ':sources'
+    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmeVersion
+    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmeVersion  + ':sources'
+    runtimeOnly 'org.jmonkeyengine:jme3-blender:' + jmeVersion
+    runtimeOnly 'org.jmonkeyengine:jme3-blender:' + jmeVersion + ':sources'
+    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jmeVersion
+    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jmeVersion + ':sources'
+    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jmeVersion
+    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jmeVersion + ':sources'
+
+    // from stephengold's bintray repositories:
+    runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.3.0-alpha2' 
+}
+
+// cleanup tasks
+clean.dependsOn('cleanAll')
+task cleanAll(type: Delete) {
+    delete fileTree(dir: '.', include: '*.dll')
+    delete fileTree(dir: '.', include: '*.dylib')
+    delete fileTree(dir: '.', include: 'hs_err_pid*.log')
+    delete fileTree(dir: '.', include: '*.so')
+}

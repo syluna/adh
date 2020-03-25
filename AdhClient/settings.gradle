@@ -1,0 +1,3 @@
+rootProject.name = 'AdhClient'
+include ':AdhCommon'
+project(':AdhCommon').projectDir = new File('../AdhCommon')

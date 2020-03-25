@@ -1,0 +1,39 @@
+description = 'Adh'
+
+ext {
+	adhVersion='1.0.0-SNAPSHOT'
+	// Dependencies version
+	jmeVersion='3.3.0-beta1'
+        log4j2Version='2.13.1'
+        lombokVersion='1.18.12'
+}
+
+allprojects {
+    apply plugin: 'java'
+    
+    group = 'fr.adh'
+    version = adhVersion
+    
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
+    }
+	
+    dependencies {
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+	implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.30'
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: log4j2Version
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4j2Version
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4j2Version
+		
+	compileOnly 'org.projectlombok:lombok:' + lombokVersion
+	annotationProcessor 'org.projectlombok:lombok:' + lombokVersion
+	
+	testCompileOnly 'org.projectlombok:lombok:' + lombokVersion
+	testAnnotationProcessor 'org.projectlombok:lombok:' + lombokVersion
+    }
+}

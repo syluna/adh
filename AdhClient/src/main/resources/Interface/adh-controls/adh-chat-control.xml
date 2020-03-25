@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty-controls xmlns="http://nifty-gui.lessvoid.com/nifty-gui">
+
+    <!-- the chatbox control consists of a ListBox for the chat, a ListBox for the player, a text input field and a button to send the message -->
+    <controlDefinition name="adh-chat" style="adh-chat-control"
+                       controller="fr.adh.client.gui.chat.AdhChatControl" lines="10" sendLabel=">>"
+                       chatLineHeight="23px">
+        <panel style="#mainPanel">
+            <panel style="#chatPanel">
+                <panel style="#chatArea">
+                    <control id="#adh-chat-box" name="listBox" vertical="on" horizontal="off" selection="Disabled"
+                             displayItems="$lines" viewConverterClass="fr.adh.client.gui.chat.AdhChatViewConverter">
+                        <control name="adh-chat-line" chatLineHeight="$chatLineHeight" border="0px" />
+                    </control>
+                </panel>
+            </panel>
+            <panel style="#spacer"/>
+            <panel style="#chatTextArea">
+                <control id="#adh-chat-text-input" name="textfield"/>
+                <control id="#adh-chat-text-button" name="button" width="" label="$sendLabel">
+                    <interact onClick="sendText()"/>
+                </control>
+            </panel>
+        </panel>
+    </controlDefinition>
+
+    <!-- this defines the control for a single line of text in the chat window -->
+    <controlDefinition name="adh-chat-line">
+        <panel childLayout="horizontal" width="100%" align="center">
+            <control id="#adh-chat-line-text" name="label" align="left" textHAlign="left" height="$chatLineHeight" width="*" wrap="true"/>
+        </panel>
+    </controlDefinition>
+
+</nifty-controls>

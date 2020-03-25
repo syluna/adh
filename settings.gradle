@@ -1,0 +1,5 @@
+rootProject.name = 'Adh'
+include ':AdhCommon', ':AdhServer', ':AdhClient'
+project(':AdhCommon').projectDir = new File('./AdhCommon')
+project(':AdhServer').projectDir = new File('./AdhServer')
+project(':AdhClient').projectDir = new File('./AdhClient')
