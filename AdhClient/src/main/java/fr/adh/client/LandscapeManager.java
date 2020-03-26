@@ -1,5 +1,8 @@
 package fr.adh.client;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
@@ -53,6 +56,8 @@ public class LandscapeManager implements ActionListener {
 
 	private final Vector3f lightDir = new Vector3f(-4.9236743f, -1.27054665f, 5.896916f);
 
+	private final Vector3f spawnPoint = new Vector3f(-434.51205f, 115.15f, 190.11417f);
+
 	private final SimpleApplication application;
 
 	private TerrainQuad terrain;
@@ -78,6 +83,10 @@ public class LandscapeManager implements ActionListener {
 	private Node playerNode;
 	private BitmapText hudText;
 
+	// Entities
+	private final Node entitiesNode = new Node("Entities Node");
+	private Map<Integer, Player> entities = new HashMap<>();
+
 	private boolean isReady = false;
 
 	public LandscapeManager(@Nonnull final SimpleApplication application) {
@@ -86,6 +95,7 @@ public class LandscapeManager implements ActionListener {
 
 	public void create(@Nonnull Node rootNode, @Nonnull final BitmapFont guiFont, String playerName) {
 		Node mainScene = new Node("Main Scene");
+		mainScene.attachChild(entitiesNode);
 		rootNode.attachChild(mainScene);
 		bulletAppState = new BulletAppState();
 		// bulletAppState.setDebugEnabled(true);
@@ -158,7 +168,7 @@ public class LandscapeManager implements ActionListener {
 		playerNode.attachChild(model);
 		playerNode.setModelBound(model.getWorldBound());
 
-		player.warp(new Vector3f(-434.51205f, 115.15f, 190.11417f));
+		player.warp(spawnPoint);
 
 		// You can change the gravity of individual physics objects after they are
 		// added to the PhysicsSpace.
@@ -281,6 +291,23 @@ public class LandscapeManager implements ActionListener {
 
 		setupKeys();
 		isReady = true;
+	}
+
+	public void addEntity(int idEntity) {
+		Player entity = new Player(spawnPoint);
+		bulletAppState.getPhysicsSpace().add(entity.getPlayerControl());
+		entitiesNode.attachChild(entity);
+		entities.put(idEntity, entity);
+	}
+
+	public void removeEntity(int idEntity) {
+		Player entity = entities.get(idEntity);
+		if (entity == null) {
+			return;
+		}
+		entitiesNode.detachChild(entity);
+		bulletAppState.getPhysicsSpace().remove(entity.getPlayerControl());
+		entities.remove(idEntity);
 	}
 
 	public void update(float tpf) {

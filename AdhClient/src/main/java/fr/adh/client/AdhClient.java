@@ -19,6 +19,7 @@ import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import fr.adh.common.ChatMessage;
 import fr.adh.common.LoginMessage;
+import fr.adh.common.SpawnEntityMessage;
 import fr.adh.common.WelcomeMessage;
 import lombok.Getter;
 
@@ -26,6 +27,7 @@ public class AdhClient extends SimpleApplication implements ClientStateListener 
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AdhClient.class);
 
+	@Getter
 	private LandscapeManager landscapeManager;
 
 	private Client client;
@@ -116,7 +118,8 @@ public class AdhClient extends SimpleApplication implements ClientStateListener 
 		try {
 			client = Network.connectToServer("Aube des heros", 1, "localhost", 8080);
 			client.addClientStateListener(this);
-			client.addMessageListener(new ClientMessageListener(), ChatMessage.class, WelcomeMessage.class);
+			client.addMessageListener(new ClientMessageListener(), ChatMessage.class, WelcomeMessage.class,
+					SpawnEntityMessage.class);
 			client.start();
 			while (!client.isConnected()) {
 				try {

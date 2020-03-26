@@ -1,5 +1,7 @@
 package fr.adh.client;
 
+import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +13,7 @@ import fr.adh.client.gui.LoginScreenController;
 import fr.adh.client.gui.StartScreenController;
 import fr.adh.common.ChatMessage;
 import fr.adh.common.ShutdownServerMessage;
+import fr.adh.common.SpawnEntityMessage;
 import fr.adh.common.WelcomeMessage;
 
 public class ClientMessageListener implements MessageListener<Client> {
@@ -35,6 +38,17 @@ public class ClientMessageListener implements MessageListener<Client> {
 			ChatMessage msg = (ChatMessage) message;
 			((StartScreenController) AdhClient.getScreenController("start")).onMessageReceived(msg.getPlayerName(),
 					msg.getMessage());
+		} else if (message instanceof SpawnEntityMessage) {
+			SpawnEntityMessage spawnEntity = (SpawnEntityMessage) message;
+			LOGGER.info("{} entity with id [{}].", spawnEntity.isSpawnOrDie() ? "Spawn" : "Remove",
+					spawnEntity.getIds());
+			if (spawnEntity.isSpawnOrDie()) {
+				Arrays.asList(spawnEntity.getIds()).forEach(AdhClient.getInstance().getLandscapeManager()::addEntity);
+			} else {
+				Arrays.asList(spawnEntity.getIds())
+						.forEach(AdhClient.getInstance().getLandscapeManager()::removeEntity);
+			}
+
 		}
 	}
 }

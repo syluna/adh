@@ -1,5 +1,8 @@
 package fr.adh.server;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +14,7 @@ import com.jme3.network.Server;
 
 import fr.adh.common.ChatMessage;
 import fr.adh.common.LoginMessage;
+import fr.adh.common.SpawnEntityMessage;
 import fr.adh.common.WelcomeMessage;
 
 public class ServerListener implements MessageListener<HostedConnection> {
@@ -35,6 +39,13 @@ public class ServerListener implements MessageListener<HostedConnection> {
 			LOGGER.info("Login message received from [{}] with login [{}].", source.getId(), loginMsg.getLogin());
 			server.broadcast(Filters.equalTo(source), new WelcomeMessage(loginMsg.getLogin(),
 					"Welcome [" + loginMsg.getLogin() + "] to the Adh server."));
+			List<Integer> connected = AdhServer.getPlayers().keySet().stream()
+					.filter(id -> id.intValue() != source.getId()).collect(Collectors.toList());
+			if (connected.size() > 0) {
+				Integer[] array = new Integer[connected.size()];
+				connected.toArray(array);
+				server.broadcast(Filters.equalTo(source), new SpawnEntityMessage(array, true));
+			}
 		}
 	}
 

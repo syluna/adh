@@ -44,6 +44,9 @@ public class LoginScreenController implements ScreenController {
 	public void onLoggin(final String id, @Nonnull final ButtonClickedEvent event) {
 		String playerName = screen.findNiftyControl("loginInput", TextField.class).getRealText();
 		String password = screen.findNiftyControl("passwordInput", TextField.class).getRealText();
+		if (playerName.length() <= 0 || password.length() <= 0) {
+			return;
+		}
 		LOGGER.info("Login button clicked [{}] Login [{}], password [{}]", id, playerName, password);
 		AdhClient.getInstance().createConnection(playerName, password);
 	}
