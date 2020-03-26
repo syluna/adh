@@ -78,11 +78,13 @@ public class LandscapeManager implements ActionListener {
 	private Node playerNode;
 	private BitmapText hudText;
 
+	private boolean isReady = false;
+
 	public LandscapeManager(@Nonnull final SimpleApplication application) {
 		this.application = application;
 	}
 
-	public void create(@Nonnull Node rootNode, @Nonnull final BitmapFont guiFont) {
+	public void create(@Nonnull Node rootNode, @Nonnull final BitmapFont guiFont, String playerName) {
 		Node mainScene = new Node("Main Scene");
 		rootNode.attachChild(mainScene);
 		bulletAppState = new BulletAppState();
@@ -165,7 +167,7 @@ public class LandscapeManager implements ActionListener {
 		hudText = new BitmapText(guiFont, false);
 		hudText.setSize(0.5f);
 		hudText.setColor(new ColorRGBA(0, 1, 1, 1));
-		hudText.setText("Joueur");
+		hudText.setText(playerName);
 
 		// hudText.setLocalTranslation(cam.getScreenCoordinates(playerNode.getLocalTranslation().add(-0.5f,
 		// 3f, 0f)));
@@ -278,9 +280,13 @@ public class LandscapeManager implements ActionListener {
 		application.getViewPort().addProcessor(fpp);
 
 		setupKeys();
+		isReady = true;
 	}
 
 	public void update(float tpf) {
+		if (!isReady) {
+			return;
+		}
 		time += tpf;
 		waterHeight = (float) Math.cos(((time * 0.6f) % FastMath.TWO_PI)) * 1.5f;
 		water.setWaterHeight(initialWaterHeight + waterHeight);

@@ -44,7 +44,7 @@ public class StartScreenController implements ScreenController {
 		if (screen == null) {
 			return;
 		}
-		AdHClient.sendMessage(chatEvent.getMessage());
+		AdHClient.getInstance().sendMessage(chatEvent.getMessage());
 	}
 
 	public void onMessageReceived(String playerName, String message) {

@@ -16,9 +16,10 @@ import com.jme3.system.AppSettings;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;
-import fr.adh.client.gui.StartScreenController;
+import de.lessvoid.nifty.screen.ScreenController;
 import fr.adh.common.ChatMessage;
-import fr.adh.common.ShutdownServerMessage;
+import fr.adh.common.LoginMessage;
+import fr.adh.common.WelcomeMessage;
 import lombok.Getter;
 
 public class AdHClient extends SimpleApplication implements ClientStateListener {
@@ -28,8 +29,10 @@ public class AdHClient extends SimpleApplication implements ClientStateListener 
 	private LandscapeManager landscapeManager;
 
 	private Client client;
+
+	private String playerName;
 	@Getter
-	private StartScreenController startScreenController;
+	private Nifty nifty;
 
 	private static AdHClient adhClient;
 
@@ -58,47 +61,43 @@ public class AdHClient extends SimpleApplication implements ClientStateListener 
 		getInstance().start();
 	}
 
-	public static final void sendMessage(String message) {
-		getInstance().client.send(new ChatMessage("Player", message));
+	public final void sendMessage(String message) {
+		if (client == null || !client.isConnected()) {
+			LOGGER.warn("Unable to send message because client is not connected.");
+			return;
+		}
+		client.send(new ChatMessage(playerName, message));
+	}
+
+	public void initLandscape(String playerName) {
+		landscapeManager = new LandscapeManager(this);
+		landscapeManager.create(rootNode, guiFont, playerName);
 	}
 
 	@Override
 	public void simpleInitApp() {
 		getFlyByCamera().setEnabled(false);
 
-		landscapeManager = new LandscapeManager(this);
-		landscapeManager.create(rootNode, guiFont);
+		NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
+		nifty = niftyDisplay.getNifty();
 
-		createGUI();
-		createConnection();
+		nifty.fromXml("Interface/start/login.xml", "login");
 
+		guiViewPort.addProcessor(niftyDisplay);
+		inputManager.setCursorVisible(true);
 	}
 
 	@Override
 	public void simpleUpdate(float tpf) {
 		super.simpleUpdate(tpf);
-		landscapeManager.update(tpf);
+		if (landscapeManager != null) {
+			landscapeManager.update(tpf);
+		}
 	}
 
 	@Override
 	public void simpleRender(RenderManager rm) {
 		// TODO: add render code
-	}
-
-	private void createGUI() {
-		NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
-		Nifty nifty = niftyDisplay.getNifty();
-		nifty.fromXml("Interface/start/start.xml", "start");
-
-		Screen startScreen = nifty.getScreen("start");
-		if (startScreen == null) {
-			return;
-		}
-		startScreenController = (StartScreenController) startScreen.getScreenController();
-		LOGGER.info("StartScreenController [{}]", startScreenController);
-
-		guiViewPort.addProcessor(niftyDisplay);
-		inputManager.setCursorVisible(true);
 	}
 
 	@Override
@@ -112,14 +111,35 @@ public class AdHClient extends SimpleApplication implements ClientStateListener 
 		LOGGER.info("Client now disconnecting.");
 	}
 
-	private void createConnection() {
+	public void createConnection(String login, String password) {
+		playerName = login;
 		try {
 			client = Network.connectToServer("Aube des heros", 1, "localhost", 8080);
 			client.addClientStateListener(this);
-			client.addMessageListener(new ClientMessageListener(), ShutdownServerMessage.class, ChatMessage.class);
+			client.addMessageListener(new ClientMessageListener(), ChatMessage.class, WelcomeMessage.class);
 			client.start();
+			while (!client.isConnected()) {
+				try {
+					Thread.sleep(1000l);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			client.send(new LoginMessage(login, password));
 		} catch (IOException ex) {
 			LOGGER.error("Connection to server error", ex);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static final <T extends ScreenController> T getScreenController(String screenName) {
+		if (AdHClient.getInstance().getNifty() == null) {
+			return null;
+		}
+		Screen startScreen = AdHClient.getInstance().getNifty().getScreen(screenName);
+		if (startScreen == null) {
+			return null;
+		}
+		return (T) startScreen.getScreenController();
 	}
 }
