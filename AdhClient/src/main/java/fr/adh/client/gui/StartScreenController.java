@@ -11,7 +11,7 @@ import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import fr.adh.client.AdHClient;
+import fr.adh.client.AdhClient;
 import fr.adh.client.gui.chat.AdhChatControl;
 import fr.adh.client.gui.chat.event.AdhChatSendTextEvent;
 
@@ -44,7 +44,7 @@ public class StartScreenController implements ScreenController {
 		if (screen == null) {
 			return;
 		}
-		AdHClient.getInstance().sendMessage(chatEvent.getMessage());
+		AdhClient.getInstance().sendMessage(chatEvent.getMessage());
 	}
 
 	public void onMessageReceived(String playerName, String message) {

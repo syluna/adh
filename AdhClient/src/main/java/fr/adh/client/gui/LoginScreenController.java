@@ -13,7 +13,7 @@ import de.lessvoid.nifty.controls.ButtonClickedEvent;
 import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import fr.adh.client.AdHClient;
+import fr.adh.client.AdhClient;
 
 public class LoginScreenController implements ScreenController {
 
@@ -45,7 +45,7 @@ public class LoginScreenController implements ScreenController {
 		String playerName = screen.findNiftyControl("loginInput", TextField.class).getRealText();
 		String password = screen.findNiftyControl("passwordInput", TextField.class).getRealText();
 		LOGGER.info("Login button clicked [{}] Login [{}], password [{}]", id, playerName, password);
-		AdHClient.getInstance().createConnection(playerName, password);
+		AdhClient.getInstance().createConnection(playerName, password);
 	}
 
 	public void onLoginSuccessMessageReceived(@Nonnull String playerName, @Nonnull String message) {
@@ -56,7 +56,7 @@ public class LoginScreenController implements ScreenController {
 
 			}
 		});
-		AdHClient.getInstance().initLandscape(playerName);
+		AdhClient.getInstance().initLandscape(playerName);
 		nifty.fromXml("Interface/start/start.xml", "start");
 
 		try {
@@ -65,7 +65,7 @@ public class LoginScreenController implements ScreenController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		((StartScreenController) AdHClient.getScreenController("start")).onSystemMessageReceived(message);
+		((StartScreenController) AdhClient.getScreenController("start")).onSystemMessageReceived(message);
 	}
 
 }

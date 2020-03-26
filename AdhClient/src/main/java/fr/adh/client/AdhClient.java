@@ -22,9 +22,9 @@ import fr.adh.common.LoginMessage;
 import fr.adh.common.WelcomeMessage;
 import lombok.Getter;
 
-public class AdHClient extends SimpleApplication implements ClientStateListener {
+public class AdhClient extends SimpleApplication implements ClientStateListener {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AdHClient.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AdhClient.class);
 
 	private LandscapeManager landscapeManager;
 
@@ -34,11 +34,11 @@ public class AdHClient extends SimpleApplication implements ClientStateListener 
 	@Getter
 	private Nifty nifty;
 
-	private static AdHClient adhClient;
+	private static AdhClient adhClient;
 
-	public static final AdHClient getInstance() {
+	public static final AdhClient getInstance() {
 		if (adhClient == null) {
-			adhClient = new AdHClient();
+			adhClient = new AdhClient();
 		}
 		return adhClient;
 	}
@@ -133,10 +133,10 @@ public class AdHClient extends SimpleApplication implements ClientStateListener 
 
 	@SuppressWarnings("unchecked")
 	public static final <T extends ScreenController> T getScreenController(String screenName) {
-		if (AdHClient.getInstance().getNifty() == null) {
+		if (AdhClient.getInstance().getNifty() == null) {
 			return null;
 		}
-		Screen startScreen = AdHClient.getInstance().getNifty().getScreen(screenName);
+		Screen startScreen = AdhClient.getInstance().getNifty().getScreen(screenName);
 		if (startScreen == null) {
 			return null;
 		}

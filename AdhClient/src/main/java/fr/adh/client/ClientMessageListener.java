@@ -22,18 +22,18 @@ public class ClientMessageListener implements MessageListener<Client> {
 		if (message instanceof ShutdownServerMessage) {
 			ShutdownServerMessage msg = (ShutdownServerMessage) message;
 			LOGGER.warn("Shutdown server message receive [{}]", msg.getReason());
-			StartScreenController controller = ((StartScreenController) AdHClient.getScreenController("start"));
+			StartScreenController controller = ((StartScreenController) AdhClient.getScreenController("start"));
 			if (controller != null) {
 				controller.onSystemMessageReceived(msg.getReason());
 			}
 		} else if (message instanceof WelcomeMessage) {
 			WelcomeMessage msg = (WelcomeMessage) message;
 			LOGGER.warn("Welcome message receive for [{}]", msg.getPlayerName());
-			((LoginScreenController) AdHClient.getScreenController("login"))
+			((LoginScreenController) AdhClient.getScreenController("login"))
 					.onLoginSuccessMessageReceived(msg.getPlayerName(), msg.getMessage());
 		} else if (message instanceof ChatMessage) {
 			ChatMessage msg = (ChatMessage) message;
-			((StartScreenController) AdHClient.getScreenController("start")).onMessageReceived(msg.getPlayerName(),
+			((StartScreenController) AdhClient.getScreenController("start")).onMessageReceived(msg.getPlayerName(),
 					msg.getMessage());
 		}
 	}
