@@ -39,11 +39,6 @@ jar.manifest.attributes('Main-Class': mainClassName)
 dependencies {
     implementation project(':AdhCommon')
     
-    runtimeOnly files('libs/nifty-examples-1.4.1.jar')
-    runtimeOnly fileTree(dir: 'libs', include: '*.jar')
-    // You can read more about how to add dependencies here:
-    //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
-
     implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion
     implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion + ':sources'
     implementation 'org.jmonkeyengine:jme3-bullet:' + jmeVersion
@@ -70,8 +65,9 @@ dependencies {
     runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jmeVersion
     runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jmeVersion + ':sources'
 
-    // from stephengold's bintray repositories:
-    runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.3.0-alpha2' 
+    // get textures and sample to start working quickly
+    runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.3.0-alpha2'
+    runtimeOnly group: 'com.github.nifty-gui', name: 'nifty-examples', version: '1.4.2' 
 }
 
 // cleanup tasks
