@@ -50,6 +50,8 @@ import com.jme3.texture.Texture2D;
 import com.jme3.util.SkyFactory;
 import com.jme3.water.WaterFilter;
 
+import lombok.Setter;
+
 public class LandscapeManager implements ActionListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LandscapeManager.class);
@@ -88,6 +90,8 @@ public class LandscapeManager implements ActionListener {
 	private Map<Integer, Player> entities = new HashMap<>();
 
 	private boolean isReady = false;
+	@Setter
+	private boolean inputEnable = true;
 
 	public LandscapeManager(@Nonnull final SimpleApplication application) {
 		this.application = application;
@@ -329,30 +333,32 @@ public class LandscapeManager implements ActionListener {
 			// waves.setDryFilter(new LowPassFilter(1,1f));
 		}
 
-		// View player camera
-		Vector3f camDir = application.getCamera().getDirection().mult(0.2f);
-		Vector3f camLeft = application.getCamera().getLeft().mult(0.2f);
-		camDir.y = 0;
-		camLeft.y = 0;
-		viewDirection.set(camDir);
-		walkDirection.set(0, 0, 0);
-		if (leftStrafe) {
-			walkDirection.addLocal(camLeft);
-		} else if (rightStrafe) {
-			walkDirection.addLocal(camLeft.negate());
+		if (inputEnable) {
+			// View player camera
+			Vector3f camDir = application.getCamera().getDirection().mult(0.2f);
+			Vector3f camLeft = application.getCamera().getLeft().mult(0.2f);
+			camDir.y = 0;
+			camLeft.y = 0;
+			viewDirection.set(camDir);
+			walkDirection.set(0, 0, 0);
+			if (leftStrafe) {
+				walkDirection.addLocal(camLeft);
+			} else if (rightStrafe) {
+				walkDirection.addLocal(camLeft.negate());
+			}
+			if (leftRotate) {
+				viewDirection.addLocal(camLeft.mult(tpf));
+			} else if (rightRotate) {
+				viewDirection.addLocal(camLeft.mult(tpf).negate());
+			}
+			if (forward) {
+				walkDirection.addLocal(camDir);
+			} else if (backward) {
+				walkDirection.addLocal(camDir.negate());
+			}
+			player.setWalkDirection(walkDirection);
+			player.setViewDirection(viewDirection);
 		}
-		if (leftRotate) {
-			viewDirection.addLocal(camLeft.mult(tpf));
-		} else if (rightRotate) {
-			viewDirection.addLocal(camLeft.mult(tpf).negate());
-		}
-		if (forward) {
-			walkDirection.addLocal(camDir);
-		} else if (backward) {
-			walkDirection.addLocal(camDir.negate());
-		}
-		player.setWalkDirection(walkDirection);
-		player.setViewDirection(viewDirection);
 	}
 
 	private void setupKeys() {
@@ -409,7 +415,7 @@ public class LandscapeManager implements ActionListener {
 
 	@Override
 	public void onAction(String binding, boolean value, float tpf) {
-		if (binding == null) {
+		if (binding == null || !inputEnable) {
 			return;
 		}
 		switch (binding) {

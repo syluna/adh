@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.FocusGainedEvent;
+import de.lessvoid.nifty.controls.FocusLostEvent;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
@@ -15,9 +17,9 @@ import fr.adh.client.AdhClient;
 import fr.adh.client.gui.chat.AdhChatControl;
 import fr.adh.client.gui.chat.event.AdhChatSendTextEvent;
 
-public class StartScreenController implements ScreenController {
+public class GuiScreenController implements ScreenController {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(StartScreenController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GuiScreenController.class);
 
 	@Nullable
 	private Screen screen;
@@ -25,7 +27,6 @@ public class StartScreenController implements ScreenController {
 	@Override
 	public void bind(Nifty nifty, Screen screen) {
 		this.screen = screen;
-
 	}
 
 	@Override
@@ -45,6 +46,18 @@ public class StartScreenController implements ScreenController {
 			return;
 		}
 		AdhClient.getInstance().sendMessage(chatEvent.getMessage());
+	}
+
+	@NiftyEventSubscriber(id = "chatMainId#adh-chat-text-input")
+	public void onTextFieldFocus(final String id, @Nonnull final FocusGainedEvent event) {
+		LOGGER.info("Focus event on [{}]", id);
+		AdhClient.getInstance().getLandscapeManager().setInputEnable(false);
+	}
+
+	@NiftyEventSubscriber(id = "chatMainId#adh-chat-text-input")
+	public void onTextFieldLostFocus(final String id, @Nonnull final FocusLostEvent event) {
+		LOGGER.info("Focus lost event on [{}]", id);
+		AdhClient.getInstance().getLandscapeManager().setInputEnable(true);
 	}
 
 	public void onMessageReceived(String playerName, String message) {

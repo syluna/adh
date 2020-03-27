@@ -145,4 +145,10 @@ public class AdhClient extends SimpleApplication implements ClientStateListener 
 		}
 		return (T) startScreen.getScreenController();
 	}
+
+	@Override
+	public void destroy() {
+		client.close();
+		super.destroy();
+	}
 }

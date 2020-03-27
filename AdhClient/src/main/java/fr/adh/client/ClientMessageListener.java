@@ -9,8 +9,8 @@ import com.jme3.network.Client;
 import com.jme3.network.Message;
 import com.jme3.network.MessageListener;
 
+import fr.adh.client.gui.GuiScreenController;
 import fr.adh.client.gui.LoginScreenController;
-import fr.adh.client.gui.StartScreenController;
 import fr.adh.common.ChatMessage;
 import fr.adh.common.ShutdownServerMessage;
 import fr.adh.common.SpawnEntityMessage;
@@ -25,7 +25,7 @@ public class ClientMessageListener implements MessageListener<Client> {
 		if (message instanceof ShutdownServerMessage) {
 			ShutdownServerMessage msg = (ShutdownServerMessage) message;
 			LOGGER.warn("Shutdown server message receive [{}]", msg.getReason());
-			StartScreenController controller = ((StartScreenController) AdhClient.getScreenController("start"));
+			GuiScreenController controller = ((GuiScreenController) AdhClient.getScreenController("gui"));
 			if (controller != null) {
 				controller.onSystemMessageReceived(msg.getReason());
 			}
@@ -36,7 +36,7 @@ public class ClientMessageListener implements MessageListener<Client> {
 					.onLoginSuccessMessageReceived(msg.getPlayerName(), msg.getMessage());
 		} else if (message instanceof ChatMessage) {
 			ChatMessage msg = (ChatMessage) message;
-			((StartScreenController) AdhClient.getScreenController("start")).onMessageReceived(msg.getPlayerName(),
+			((GuiScreenController) AdhClient.getScreenController("gui")).onMessageReceived(msg.getPlayerName(),
 					msg.getMessage());
 		} else if (message instanceof SpawnEntityMessage) {
 			SpawnEntityMessage spawnEntity = (SpawnEntityMessage) message;

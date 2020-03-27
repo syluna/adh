@@ -60,7 +60,7 @@ public class LoginScreenController implements ScreenController {
 			}
 		});
 		AdhClient.getInstance().initLandscape(playerName);
-		nifty.fromXml("Interface/start/start.xml", "start");
+		nifty.fromXml("Interface/start/gui.xml", "gui");
 
 		try {
 			Thread.sleep(2000l);
@@ -68,7 +68,7 @@ public class LoginScreenController implements ScreenController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		((StartScreenController) AdhClient.getScreenController("start")).onSystemMessageReceived(message);
+		((GuiScreenController) AdhClient.getScreenController("gui")).onSystemMessageReceived(message);
 	}
 
 }
