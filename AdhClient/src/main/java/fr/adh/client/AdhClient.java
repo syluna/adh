@@ -111,6 +111,7 @@ public class AdhClient extends SimpleApplication implements ClientStateListener 
 	@Override
 	public void clientDisconnected(Client client, DisconnectInfo arg1) {
 		LOGGER.info("Client now disconnecting.");
+		stop();
 	}
 
 	public void createConnection(String login, String password) {
@@ -148,7 +149,9 @@ public class AdhClient extends SimpleApplication implements ClientStateListener 
 
 	@Override
 	public void destroy() {
-		client.close();
+		if (client.isStarted()) {
+			client.close();
+		}
 		super.destroy();
 	}
 }

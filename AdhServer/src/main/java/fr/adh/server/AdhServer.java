@@ -1,6 +1,10 @@
 package fr.adh.server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,10 +36,18 @@ public class AdhServer extends SimpleApplication implements ConnectionListener {
 	private static Map<Integer, HostedConnection> players = new HashMap<>();
 
 	private Server server;
+	private static BufferedReader cin;
 
 	public static void main(String[] args) throws Exception {
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
+
+		try {
+			cin = new BufferedReader(new InputStreamReader(System.in, Charset.defaultCharset().name()));
+		} catch (final UnsupportedEncodingException e) {
+			e.printStackTrace();
+			cin = new BufferedReader(new InputStreamReader(System.in));
+		}
 
 		AdhServer adhServer = new AdhServer();
 		adhServer.start(JmeContext.Type.Headless);
@@ -64,12 +76,15 @@ public class AdhServer extends SimpleApplication implements ConnectionListener {
 	@Override
 	public void simpleUpdate(float tpf) {
 		super.simpleUpdate(tpf);
+		consoleCommands();
 	}
 
 	@Override
 	public void destroy() {
-		LOGGER.info("Shutdowning server.");
+		LOGGER.info("Shutdowning server. Kick [{}] client.", server.getConnections().size());
+		server.getConnections().forEach(c -> c.close("Server stopping."));
 		server.close();
+		LOGGER.info("Server shutdown.");
 		super.destroy();
 	}
 
@@ -87,4 +102,19 @@ public class AdhServer extends SimpleApplication implements ConnectionListener {
 		server.broadcast(Filters.notEqualTo(con), new SpawnEntityMessage(con.getId(), false));
 	}
 
+	private void consoleCommands() {
+		try {
+			if (cin.ready()) {
+				final String line = cin.readLine().trim();
+				if (line.length() > 0) {
+					LOGGER.info("Line entry : [{}]", line);
+					if ("stop".equalsIgnoreCase(line) && server.isRunning()) {
+						stop();
+					}
+				}
+			}
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
