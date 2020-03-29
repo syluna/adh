@@ -37,9 +37,11 @@ import com.jme3.post.filters.DepthOfFieldFilter;
 import com.jme3.post.filters.FXAAFilter;
 import com.jme3.post.filters.LightScatteringFilter;
 import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.BillboardControl;
+import com.jme3.scene.shape.Sphere;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.geomipmap.lodcalc.DistanceLodCalculator;
@@ -105,7 +107,8 @@ public class LandscapeManager implements ActionListener {
 		// bulletAppState.setDebugEnabled(true);
 		application.getStateManager().attach(bulletAppState);
 
-		matRock = new Material(application.getAssetManager(), "Common/MatDefs/Terrain/TerrainLighting.j3md");
+		String terrainAsset = "Common/MatDefs/Terrain/TerrainLighting.j3md";
+		matRock = new Material(application.getAssetManager(), terrainAsset);
 		matRock.setBoolean("useTriPlanarMapping", false);
 		matRock.setFloat("Shininess", 0.0f);
 		matRock.setBoolean("WardIso", true);
@@ -217,19 +220,13 @@ public class LandscapeManager implements ActionListener {
 
 		application.getFlyByCamera().setEnabled(false);
 
-		DirectionalLight sun = new DirectionalLight();
-		sun.setDirection(lightDir);
-		sun.setColor(ColorRGBA.White.clone().multLocal(1f));
-		mainScene.addLight(sun);
+		createSun(mainScene);
 
 		AmbientLight al = new AmbientLight();
 		al.setColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 1.0f));
 		mainScene.addLight(al);
 
-		Spatial sky = SkyFactory.createSky(application.getAssetManager(), "Scenes/Beach/FullskiesSunset0068.dds",
-				SkyFactory.EnvMapType.CubeMap);
-		sky.setLocalScale(350);
-		mainScene.attachChild(sky);
+		createSkyBox(mainScene);
 
 		// Water Filter
 		water = new WaterFilter(mainScene, lightDir);
@@ -257,7 +254,7 @@ public class LandscapeManager implements ActionListener {
 		bloom.setBloomIntensity(1.0f);
 
 		// Light Scattering Filter
-		LightScatteringFilter lsf = new LightScatteringFilter(lightDir.mult(-300));
+		LightScatteringFilter lsf = new LightScatteringFilter(lightDir.mult(-3000));
 		lsf.setLightDensity(0.5f);
 
 		// Depth of field Filter
@@ -295,6 +292,26 @@ public class LandscapeManager implements ActionListener {
 
 		setupKeys();
 		isReady = true;
+	}
+
+	public void createSun(Node rootNode) {
+		DirectionalLight sun = new DirectionalLight();
+		sun.setDirection(lightDir);
+		sun.setColor(ColorRGBA.White.clone().multLocal(1f));
+		rootNode.addLight(sun);
+	}
+
+	public void createSkyBox(Node rootNode) {
+		Texture west = application.getAssetManager().loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
+		Texture east = application.getAssetManager().loadTexture("Textures/Sky/Lagoon/lagoon_east.jpg");
+		Texture north = application.getAssetManager().loadTexture("Textures/Sky/Lagoon/lagoon_north.jpg");
+		Texture south = application.getAssetManager().loadTexture("Textures/Sky/Lagoon/lagoon_south.jpg");
+		Texture up = application.getAssetManager().loadTexture("Textures/Sky/Lagoon/lagoon_up.jpg");
+		Texture down = application.getAssetManager().loadTexture("Textures/Sky/Lagoon/lagoon_down.jpg");
+
+		Spatial sky = SkyFactory.createSky(application.getAssetManager(), west, east, north, south, up, down);
+		sky.setLocalScale(350);
+		rootNode.attachChild(sky);
 	}
 
 	public void addEntity(int idEntity) {
