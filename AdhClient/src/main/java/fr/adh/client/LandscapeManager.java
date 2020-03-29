@@ -10,9 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import com.jme3.app.ChaseCameraAppState;
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.TextureKey;
 import com.jme3.audio.AudioData;
 import com.jme3.audio.AudioNode;
 import com.jme3.audio.LowPassFilter;
+import com.jme3.bounding.BoundingBox;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.control.CharacterControl;
@@ -37,17 +39,16 @@ import com.jme3.post.filters.DepthOfFieldFilter;
 import com.jme3.post.filters.FXAAFilter;
 import com.jme3.post.filters.LightScatteringFilter;
 import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.BillboardControl;
-import com.jme3.scene.shape.Sphere;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.geomipmap.lodcalc.DistanceLodCalculator;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
+import com.jme3.texture.Texture.WrapMode;
 import com.jme3.texture.Texture2D;
 import com.jme3.util.SkyFactory;
 import com.jme3.water.WaterFilter;
@@ -58,14 +59,14 @@ public class LandscapeManager implements ActionListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LandscapeManager.class);
 
-	private final Vector3f lightDir = new Vector3f(-4.9236743f, -1.27054665f, 5.896916f);
+	private final Vector3f lightDir = new Vector3f(-0.1f, -0.1f, -0.1f);
 
-	private final Vector3f spawnPoint = new Vector3f(-434.51205f, 115.15f, 190.11417f);
+	private final Vector3f spawnPoint = new Vector3f(0, 130, -10);// new Vector3f(-434.51205f, 115.15f, 190.11417f);
 
 	private final SimpleApplication application;
 
 	private TerrainQuad terrain;
-	private Material matRock;
+	private Material matTerrain;
 
 	// Water (Ocean)
 	private WaterFilter water;
@@ -80,7 +81,13 @@ public class LandscapeManager implements ActionListener {
 	private final Vector3f viewDirection = new Vector3f(0, 0, 0);
 	boolean leftStrafe = false, rightStrafe = false, forward = false, backward = false, leftRotate = false,
 			rightRotate = false;
-
+	private float dirtScale = 16;
+	private float darkRockScale = 32;
+	private float pinkRockScale = 32;
+	private float riverRockScale = 80;
+	private float grassScale = 32;
+	private float brickScale = 128;
+	private float roadScale = 200;
 	// Physique
 	private BulletAppState bulletAppState;
 	private CharacterControl player;
@@ -108,52 +115,97 @@ public class LandscapeManager implements ActionListener {
 		application.getStateManager().attach(bulletAppState);
 
 		String terrainAsset = "Common/MatDefs/Terrain/TerrainLighting.j3md";
-		matRock = new Material(application.getAssetManager(), terrainAsset);
-		matRock.setBoolean("useTriPlanarMapping", false);
-		matRock.setFloat("Shininess", 0.0f);
-		matRock.setBoolean("WardIso", true);
-		matRock.setTexture("AlphaMap",
-				application.getAssetManager().loadTexture("Textures/Terrain/splat/alphamap.png"));
-		Texture heightMapImage = application.getAssetManager().loadTexture("Textures/Terrain/splat/mountains512.png");
-		Texture grass = application.getAssetManager().loadTexture("Textures/Terrain/splat/grass.jpg");
-		grass.setWrap(Texture.WrapMode.Repeat);
-		matRock.setTexture("DiffuseMap", grass);
-		matRock.setFloat("DiffuseMap_0_scale", 64);
+		matTerrain = new Material(application.getAssetManager(), terrainAsset);
+		matTerrain.setBoolean("useTriPlanarMapping", false);
+		matTerrain.setFloat("Shininess", 0.0f);
+		matTerrain.setBoolean("WardIso", true);
+
+		// ALPHA map (for splat textures)
+		matTerrain.setTexture("AlphaMap",
+				application.getAssetManager().loadTexture("Textures/Terrain/splat/alpha1.png"));
+		matTerrain.setTexture("AlphaMap_1",
+				application.getAssetManager().loadTexture("Textures/Terrain/splat/alpha2.png"));
+
+		// HEIGHTMAP image (for the terrain heightmap)
+		TextureKey hmKey = new TextureKey("Textures/Terrain/splat/mountains512.png", false);
+		Texture heightMapImage = application.getAssetManager().loadTexture(hmKey);
+
+		// DIRT texture, Diffuse textures 0 to 3 use the first AlphaMap
 		Texture dirt = application.getAssetManager().loadTexture("Textures/Terrain/splat/dirt.jpg");
-		dirt.setWrap(Texture.WrapMode.Repeat);
-		matRock.setTexture("DiffuseMap_1", dirt);
-		matRock.setFloat("DiffuseMap_1_scale", 16);
-		Texture rock = application.getAssetManager().loadTexture("Textures/Terrain/splat/road.jpg");
-		rock.setWrap(Texture.WrapMode.Repeat);
-		matRock.setTexture("DiffuseMap_2", rock);
-		matRock.setFloat("DiffuseMap_2_scale", 128);
-		Texture normalMap0 = application.getAssetManager().loadTexture("Textures/Terrain/splat/grass_normal.jpg");
-		normalMap0.setWrap(Texture.WrapMode.Repeat);
-		Texture normalMap1 = application.getAssetManager().loadTexture("Textures/Terrain/splat/dirt_normal.png");
-		normalMap1.setWrap(Texture.WrapMode.Repeat);
-		Texture normalMap2 = application.getAssetManager().loadTexture("Textures/Terrain/splat/road_normal.png");
-		normalMap2.setWrap(Texture.WrapMode.Repeat);
-		matRock.setTexture("NormalMap", normalMap0);
-		matRock.setTexture("NormalMap_1", normalMap1);
-		matRock.setTexture("NormalMap_2", normalMap2);
+		dirt.setWrap(WrapMode.Repeat);
+		matTerrain.setTexture("DiffuseMap", dirt);
+		matTerrain.setFloat("DiffuseMap_0_scale", dirtScale);
+
+		// DARK ROCK texture
+		Texture darkRock = application.getAssetManager().loadTexture("Textures/Terrain/Rock2/rock.jpg");
+		darkRock.setWrap(WrapMode.Repeat);
+		matTerrain.setTexture("DiffuseMap_1", darkRock);
+		matTerrain.setFloat("DiffuseMap_1_scale", darkRockScale);
+
+		// PINK ROCK texture
+		Texture pinkRock = application.getAssetManager().loadTexture("Textures/Terrain/Rock/Rock.PNG");
+		pinkRock.setWrap(WrapMode.Repeat);
+		matTerrain.setTexture("DiffuseMap_2", pinkRock);
+		matTerrain.setFloat("DiffuseMap_2_scale", pinkRockScale);
+
+		// RIVER ROCK texture, this texture will use the next alphaMap: AlphaMap_1
+		Texture riverRock = application.getAssetManager().loadTexture("Textures/Terrain/Pond/Pond.jpg");
+		riverRock.setWrap(WrapMode.Repeat);
+		matTerrain.setTexture("DiffuseMap_3", riverRock);
+		matTerrain.setFloat("DiffuseMap_3_scale", riverRockScale);
+
+		// GRASS texture
+		Texture grass = application.getAssetManager().loadTexture("Textures/Terrain/splat/grass.jpg");
+		grass.setWrap(WrapMode.Repeat);
+		matTerrain.setTexture("DiffuseMap_4", grass);
+		matTerrain.setFloat("DiffuseMap_4_scale", grassScale);
+
+		// BRICK texture
+		Texture brick = application.getAssetManager().loadTexture("Textures/Terrain/BrickWall/BrickWall.jpg");
+		brick.setWrap(WrapMode.Repeat);
+		matTerrain.setTexture("DiffuseMap_5", brick);
+		matTerrain.setFloat("DiffuseMap_5_scale", brickScale);
+
+		// ROAD texture
+		Texture road = application.getAssetManager().loadTexture("Textures/Terrain/splat/road.jpg");
+		road.setWrap(WrapMode.Repeat);
+		matTerrain.setTexture("DiffuseMap_6", road);
+		matTerrain.setFloat("DiffuseMap_6_scale", roadScale);
+
+		// NORMAL MAPS
+		Texture normalMapDirt = application.getAssetManager().loadTexture("Textures/Terrain/splat/dirt_normal.png");
+		normalMapDirt.setWrap(WrapMode.Repeat);
+		Texture normalMapPinkRock = application.getAssetManager().loadTexture("Textures/Terrain/Rock/Rock_normal.png");
+		normalMapPinkRock.setWrap(WrapMode.Repeat);
+		Texture normalMapGrass = application.getAssetManager().loadTexture("Textures/Terrain/splat/grass_normal.jpg");
+		normalMapGrass.setWrap(WrapMode.Repeat);
+		Texture normalMapRoad = application.getAssetManager().loadTexture("Textures/Terrain/splat/road_normal.png");
+		normalMapRoad.setWrap(WrapMode.Repeat);
+		matTerrain.setTexture("NormalMap", normalMapDirt);
+		matTerrain.setTexture("NormalMap_1", normalMapPinkRock);
+		matTerrain.setTexture("NormalMap_2", normalMapPinkRock);
+		matTerrain.setTexture("NormalMap_4", normalMapGrass);
+		matTerrain.setTexture("NormalMap_6", normalMapRoad);
 
 		AbstractHeightMap heightmap = null;
 		try {
-			heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 0.25f);
+			heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 0.3f);
 			heightmap.load();
 			heightmap.smooth(0.9f, 1);
 		} catch (Exception e) {
 			LOGGER.error("Error when loading HeightMapImage ! ", e);
 		}
-		terrain = new TerrainQuad("terrain", 65, 513, heightmap == null ? null : heightmap.getHeightMap());
+		terrain = new TerrainQuad("terrain", 65, 513, heightmap.getHeightMap());
 		TerrainLodControl control = new TerrainLodControl(terrain, application.getCamera());
 		control.setLodCalculator(new DistanceLodCalculator(65, 2.7f));
-		terrain.setMaterial(matRock);
-		terrain.setLocalScale(new Vector3f(5, 5, 5));
-		terrain.setLocalTranslation(new Vector3f(0, 30, 0));
-
-		terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
+		// terrain.addControl(control);
+		// terrain.setShadowMode(RenderQueue.ShadowMode.Receive);
 		terrain.addControl(new RigidBodyControl(0));
+		terrain.setMaterial(matTerrain);
+		terrain.setModelBound(new BoundingBox());
+		terrain.updateModelBound();
+		terrain.setLocalTranslation(0, -100, 0);
+		terrain.setLocalScale(1f, 1f, 1f);
 
 		mainScene.attachChild(terrain);
 		bulletAppState.getPhysicsSpace().add(terrain);
@@ -167,7 +219,7 @@ public class LandscapeManager implements ActionListener {
 		Spatial model = application.getAssetManager().loadModel("Models/Ninja/Ninja.mesh.xml");
 		model.scale(0.02f, 0.02f, 0.02f);
 		model.rotate(0.0f, -3.0f, 0.0f);
-		model.setLocalTranslation(0f, -1.4f, 0f);
+		// model.setLocalTranslation(0f, -1.4f, 0f);
 
 		playerNode.addControl(player);
 		bulletAppState.getPhysicsSpace().add(player);
@@ -218,8 +270,6 @@ public class LandscapeManager implements ActionListener {
 		chaseCam.setZoomSpeed(0.1f);
 		chaseCam.setDefaultVerticalRotation(0.3f);
 
-		application.getFlyByCamera().setEnabled(false);
-
 		createSun(mainScene);
 
 		AmbientLight al = new AmbientLight();
@@ -263,8 +313,7 @@ public class LandscapeManager implements ActionListener {
 		dof.setFocusRange(100);
 
 		FilterPostProcessor fpp = new FilterPostProcessor(application.getAssetManager());
-
-		fpp.addFilter(water);
+		// fpp.addFilter(water);
 		fpp.addFilter(bloom);
 		fpp.addFilter(dof);
 		fpp.addFilter(lsf);
@@ -296,7 +345,7 @@ public class LandscapeManager implements ActionListener {
 
 	public void createSun(Node rootNode) {
 		DirectionalLight sun = new DirectionalLight();
-		sun.setDirection(lightDir);
+		sun.setDirection(lightDir.normalize());
 		sun.setColor(ColorRGBA.White.clone().multLocal(1f));
 		rootNode.addLight(sun);
 	}

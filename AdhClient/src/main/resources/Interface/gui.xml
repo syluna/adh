@@ -7,6 +7,26 @@
     <useControls filename="nifty-default-controls.xml"/>
     <useControls filename="Interface/adh-controls/adh-chat-control.xml"/>
     <useStyles filename="Interface/adh-controls/adh-chat-styles.xml"/>
+    
+    <screen id="login" controller="fr.adh.client.gui.LoginScreenController">
+        <layer id="background" backgroundColor="#000F" />
+        <layer childLayout="center">
+      		<panel id="dialog" style="nifty-panel" childLayout="vertical" padding="18px,28px,28px,16px" width="350px" align="center" valign="center">
+	      		<panel align="center" valign="center" childLayout="horizontal" width="100%" padding="5px">
+	        		<control name="label" text="${itf.login.label} :" width="120px" align="left" valign="center" textHAlign="left" />
+	        		<control id="loginInput" name="textfield" maxLength="30" filter="^[\p{L} '-]+$" />
+	          	</panel>
+	          	<panel align="center" valign="center" childLayout="horizontal" width="100%" padding="5px">
+	        		<control name="label" text="${itf.password.label} :" width="120px" align="left" valign="center" textHAlign="left" />
+	        		<control id="passwordInput" name="textfield" passwordChar="*" />
+	        	</panel>
+	        	<panel childLayout="vertical" width="100%" padding="5px">
+	        		<control id="loginButton" name="button" label="Login" align="center" valign="center" />
+	        	</panel>
+        	</panel>
+    	</layer>            
+    </screen>
+    
     <screen id="gui" controller="fr.adh.client.gui.GuiScreenController">
         <!--<layer id="background" backgroundColor="#000F" />-->
         <!--layer id="layer" childLayout="center">
@@ -24,6 +44,5 @@
                 </control>
             </control>
         </layer>
-                
     </screen>
 </nifty>

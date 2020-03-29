@@ -82,8 +82,7 @@ public class AdhClient extends SimpleApplication implements ClientStateListener 
 
 		NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
 		nifty = niftyDisplay.getNifty();
-
-		nifty.fromXml("Interface/start/login.xml", "login");
+		nifty.fromXml("Interface/gui.xml", "login");
 
 		guiViewPort.addProcessor(niftyDisplay);
 		inputManager.setCursorVisible(true);
@@ -149,7 +148,7 @@ public class AdhClient extends SimpleApplication implements ClientStateListener 
 
 	@Override
 	public void destroy() {
-		if (client.isStarted()) {
+		if (client != null && client.isStarted()) {
 			client.close();
 		}
 		super.destroy();

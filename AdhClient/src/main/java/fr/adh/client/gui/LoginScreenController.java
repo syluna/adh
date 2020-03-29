@@ -60,7 +60,7 @@ public class LoginScreenController implements ScreenController {
 			}
 		});
 		AdhClient.getInstance().initLandscape(playerName);
-		nifty.fromXml("Interface/start/gui.xml", "gui");
+		nifty.gotoScreen("gui");
 
 		try {
 			Thread.sleep(2000l);

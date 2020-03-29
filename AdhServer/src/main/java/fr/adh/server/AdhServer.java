@@ -3,8 +3,13 @@ package fr.adh.server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,14 +112,48 @@ public class AdhServer extends SimpleApplication implements ConnectionListener {
 			if (cin.ready()) {
 				final String line = cin.readLine().trim();
 				if (line.length() > 0) {
-					LOGGER.info("Line entry : [{}]", line);
-					if ("stop".equalsIgnoreCase(line) && server.isRunning()) {
+					String[] command = split(line);
+					LOGGER.info("Command [{}] args [{}] [{}]", command[0], command.length - 1,
+							String.join(", ", Arrays.copyOfRange(command, 1, command.length)));
+					if ("stop".equalsIgnoreCase(command[0]) && server.isRunning()) {
 						stop();
 					}
 				}
 			}
 		} catch (final IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private String[] split(final String commandLine) {
+		ArrayList<String> parts = new ArrayList<String>();
+
+		Reader r = new StringReader(commandLine);
+		StreamTokenizer st = new StreamTokenizer(r);
+		st.resetSyntax();
+		st.wordChars(32, 255);
+		st.whitespaceChars(0, ' ');
+		st.quoteChar('"');
+		st.quoteChar('\'');
+
+		int token;
+		try {
+			while ((token = st.nextToken()) != StreamTokenizer.TT_EOF) {
+				switch (token) {
+				case StreamTokenizer.TT_WORD:
+					parts.add(st.sval);
+					break;
+				case '\'':
+				case '"':
+					parts.add(st.sval);
+					break;
+				default:
+				}
+			}
+			return parts.toArray(new String[parts.size()]);
+		} catch (IOException e) {
+			LOGGER.warn("exception whild parsing '{}'", commandLine);
+			return new String[] { commandLine };
 		}
 	}
 }
