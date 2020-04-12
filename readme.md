@@ -1,7 +1,7 @@
 # Aube des Héros
 =================
 
-An open source client/server game to learn how to write a game in Java.
+An open source example client/server game to learn how to write a game in Java using several librairies done by jme community.
 
 Goal is to implement a game using jMonkeyEngine a 3D game engine fully in Java and cross platform.
 
