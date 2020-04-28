@@ -1,0 +1,3 @@
+rootProject.name = 'AdhSample'
+include ':AdhCommon'
+project(':AdhCommon').projectDir = new File('../AdhCommon')

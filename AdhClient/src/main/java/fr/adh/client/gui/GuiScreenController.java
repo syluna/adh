@@ -51,13 +51,13 @@ public class GuiScreenController implements ScreenController {
 	@NiftyEventSubscriber(id = "chatMainId#adh-chat-text-input")
 	public void onTextFieldFocus(final String id, @Nonnull final FocusGainedEvent event) {
 		LOGGER.info("Focus event on [{}]", id);
-		AdhClient.getInstance().getLandscapeManager().setInputEnable(false);
+		AdhClient.getInstance().setInputEnable(false);
 	}
 
 	@NiftyEventSubscriber(id = "chatMainId#adh-chat-text-input")
 	public void onTextFieldLostFocus(final String id, @Nonnull final FocusLostEvent event) {
 		LOGGER.info("Focus lost event on [{}]", id);
-		AdhClient.getInstance().getLandscapeManager().setInputEnable(true);
+		AdhClient.getInstance().setInputEnable(true);
 	}
 
 	public void onMessageReceived(String playerName, String message) {

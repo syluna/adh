@@ -1,10 +1,18 @@
 # Aube des Héros
 =================
 
-An open source example client/server game to learn how to write a game in Java using several librairies done by jme community.
+A open source client/server sandbox game project to learn how to write a 3D game in Java.
 
-Goal is to implement a game using jMonkeyEngine a 3D game engine fully in Java and cross platform.
+Java Game Engine is jMonkeyEngine : https://jmonkeyengine.org/ 
 
+Using some librairies from the JME community like : 
+- JME World Pager : To generate infite world with physics : https://github.com/jayfella/jme-world-pager 
+- JME Atmosphere : To manage sky/sun/moon/cloud/star : https://github.com/jayfella/jme-atmosphere
+- JME Fastnoise : Dependency for world and texture : https://github.com/jayfella/jme-fastnoise 
+- Minie : Dependency for physics an collision : https://github.com/stephengold/Minie 
+- JME Convert : for model convertion : https://github.com/Simsilica
+
+And more other show JME Store : https://jmonkeystore.com/
 
 License
 ==========

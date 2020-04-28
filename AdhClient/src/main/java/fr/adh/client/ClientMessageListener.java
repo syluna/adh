@@ -43,10 +43,9 @@ public class ClientMessageListener implements MessageListener<Client> {
 			LOGGER.info("{} entity with id [{}].", spawnEntity.isSpawnOrDie() ? "Spawn" : "Remove",
 					spawnEntity.getIds());
 			if (spawnEntity.isSpawnOrDie()) {
-				Arrays.asList(spawnEntity.getIds()).forEach(AdhClient.getInstance().getLandscapeManager()::addEntity);
+				Arrays.asList(spawnEntity.getIds()).forEach(AdhClient.getInstance()::addEntity);
 			} else {
-				Arrays.asList(spawnEntity.getIds())
-						.forEach(AdhClient.getInstance().getLandscapeManager()::removeEntity);
+				Arrays.asList(spawnEntity.getIds()).forEach(AdhClient.getInstance()::removeEntity);
 			}
 
 		}

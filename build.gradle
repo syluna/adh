@@ -3,9 +3,11 @@ description = 'Adh'
 ext {
 	adhVersion='1.0.0-SNAPSHOT'
 	// Dependencies version
-	jmeVersion='3.3.0-beta1'
-        log4j2Version='2.13.1'
-        lombokVersion='1.18.12'
+	jmeVersion='3.3.0-stable'
+	minieVersion='1.6.0'
+	
+    log4j2Version='2.13.1'
+    lombokVersion='1.18.12'
 }
 
 allprojects {
@@ -14,26 +16,28 @@ allprojects {
     group = 'fr.adh'
     version = adhVersion
     
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    sourceCompatibility = JavaVersion.VERSION_13
+    targetCompatibility = JavaVersion.VERSION_13
 
     repositories {
-        jcenter()
-        mavenCentral()
-        maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
+		jcenter()
+		mavenCentral()
+		maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
+		maven { url 'https://jitpack.io' }
     }
 	
     dependencies {
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-	implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.30'
-        implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: log4j2Version
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4j2Version
-	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4j2Version
+		implementation "org.slf4j:slf4j-api:1.7.25"
+		implementation "org.slf4j:jul-to-slf4j:1.7.30"
+		implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4j2Version"
+		implementation "org.apache.logging.log4j:log4j-core:$log4j2Version"
+		implementation "org.apache.logging.log4j:log4j-api:$log4j2Version"
 		
-	compileOnly 'org.projectlombok:lombok:' + lombokVersion
-	annotationProcessor 'org.projectlombok:lombok:' + lombokVersion
+		compileOnly "org.projectlombok:lombok:$lombokVersion"
+		annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 	
-	testCompileOnly 'org.projectlombok:lombok:' + lombokVersion
-	testAnnotationProcessor 'org.projectlombok:lombok:' + lombokVersion
+		testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+		testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
     }
+    
 }
