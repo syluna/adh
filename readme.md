@@ -10,7 +10,7 @@ Using some librairies from the JME community like :
 - JME Atmosphere : To manage sky/sun/moon/cloud/star : https://github.com/jayfella/jme-atmosphere
 - JME Fastnoise : Dependency for world and texture : https://github.com/jayfella/jme-fastnoise 
 - Minie : Dependency for physics an collision : https://github.com/stephengold/Minie 
-- JME Convert : for model convertion : https://github.com/Simsilica
+- JME Convert : for model conversion : https://github.com/Simsilica
 
 And more other show JME Store : https://jmonkeystore.com/
 
