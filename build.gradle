@@ -3,7 +3,7 @@ description = 'Adh'
 ext {
 	adhVersion='1.0.0-SNAPSHOT'
 	// Dependencies version
-	jmeVersion='3.3.0-stable'
+	jmeVersion='3.3.2-stable'
 	minieVersion='1.6.0'
 	
     log4j2Version='2.13.1'

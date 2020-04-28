@@ -26,7 +26,7 @@ public class Player {
 
     public Player(final AssetManager assetManager, Vector3f spawnPoint, String name) {
         node = (Node) assetManager.loadModel("Models/Ninja/Ninja.j3o");
-        node.scale(0.02f, 0.02f, 0.02f);
+        node.setLocalScale(0.02f, 0.02f, 0.02f);
         node.setLocalTranslation(spawnPoint);
 
         BetterCharacterControl playerControl = new BetterCharacterControl(0.8f, 3.8f, 1f);

@@ -15,6 +15,14 @@ import com.jme3.anim.util.AnimMigrationUtils;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.BulletAppState.ThreadingType;
+import com.jme3.bullet.RotationOrder;
+import com.jme3.bullet.animation.CenterHeuristic;
+import com.jme3.bullet.animation.DacConfiguration;
+import com.jme3.bullet.animation.DynamicAnimControl;
+import com.jme3.bullet.animation.LinkConfig;
+import com.jme3.bullet.animation.MassHeuristic;
+import com.jme3.bullet.animation.RangeOfMotion;
+import com.jme3.bullet.animation.ShapeHeuristic;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
@@ -65,6 +73,7 @@ public class AdhSample extends SimpleApplication {
     private NewAtmosphereState atmosphereState;
     private Player player;
     private Node spider;
+    private Node sinbad;
 
     private boolean isInitialized = false;
 
@@ -95,6 +104,9 @@ public class AdhSample extends SimpleApplication {
 
         spider = createSpider();
         rootNode.attachChild(spider);
+
+        sinbad = createSinbad();
+        rootNode.attachChild(sinbad);
 
         // Create World
         WorldSettings worldSettings = new WorldSettings();
@@ -155,7 +167,12 @@ public class AdhSample extends SimpleApplication {
 
             physicsState.getPhysicsSpace().addAll(player.getNode());
             physicsState.getPhysicsSpace().add(player.getControl());
+
             physicsState.getPhysicsSpace().add(spider.getControl(BetterCharacterControl.class));
+
+            // physicsState.getPhysicsSpace().addAll(sinbad);
+            physicsState.getPhysicsSpace().add(sinbad.getControl(BetterCharacterControl.class));
+            physicsState.getPhysicsSpace().add(sinbad.getControl(DynamicAnimControl.class));
         }
 
         world.setFollower(cam.getLocation());
@@ -181,10 +198,15 @@ public class AdhSample extends SimpleApplication {
         AnimClip animClip = animComposer.getAnimClip("Idle");
         animComposer.setCurrentAction(animClip.getName());
 
+        attachName(spiderNode, "Spider", 2.6f);
+        return spiderNode;
+    }
+
+    public void attachName(Node node, String name, float offset) {
         BitmapText hudText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
         hudText.setSize(0.5f);
         hudText.setColor(new ColorRGBA(0, 1, 1, 1));
-        hudText.setText("Spider");
+        hudText.setText(name);
 
 //        hudText.setLocalTranslation(cam.getScreenCoordinates(model.getLocalTranslation().add(-0.5f, 3f, 0f)));
         float textWidth = hudText.getLineWidth() + 20;
@@ -197,11 +219,52 @@ public class AdhSample extends SimpleApplication {
         hudText.addControl(bc);
 
         Node textNode = new Node("LabelNode");
-        textNode.setLocalTranslation(0f, 2.6f + hudText.getHeight(), 0);
+        textNode.setLocalTranslation(0f, offset + hudText.getHeight(), 0);
         textNode.attachChild(hudText);
-        spiderNode.attachChild(textNode);
-
-        return spiderNode;
+        node.attachChild(textNode);
     }
 
+    public Node createSinbad() {
+        Node model = (Node) assetManager.loadModel("Models/Sinbad/Sinbad.j3o");
+        model.scale(0.3f);
+        model.lookAt(new Vector3f(0f, 0f, -1f), Vector3f.UNIT_Y);
+        model.setLocalTranslation(new Vector3f(2.5f, 15f, 0f));
+
+        AnimComposer composer = model.getControl(AnimComposer.class);
+        composer.setCurrentAction("IdleTop");
+
+//        BetterCharacterControl betterCharacterControl = new BetterCharacterControl(0.5f, 3f, 20f);
+//        model.addControl(betterCharacterControl);
+
+        DynamicAnimControl ragdoll = new DynamicAnimControl();
+        LinkConfig hull = new LinkConfig(1f, MassHeuristic.Density, ShapeHeuristic.VertexHull, new Vector3f(1f, 1f, 1f),
+                CenterHeuristic.Mean, RotationOrder.XYZ);
+        ragdoll.setConfig(DacConfiguration.torsoName, hull);
+        ragdoll.link("Waist", 1f, new RangeOfMotion(1f, -0.4f, 0.8f, -0.8f, 0.4f, -0.4f));
+        ragdoll.link("Chest", 1f, new RangeOfMotion(0.4f, 0f, 0.4f));
+        ragdoll.link("Neck", 1f, new RangeOfMotion(0.5f, 1f, 0.7f));
+
+        ragdoll.link("Clavicle.R", 1f, new RangeOfMotion(0.3f, -0.6f, 0f, 0f, 0.4f, -0.4f));
+        ragdoll.link("Humerus.R", 1f, new RangeOfMotion(1.6f, -0.8f, 1f, -1f, 1.6f, -1f));
+        ragdoll.link("Ulna.R", 1f, new RangeOfMotion(0f, 0f, 1f, -1f, 0f, -2f));
+        ragdoll.link("Hand.R", 1f, new RangeOfMotion(0.8f, 0f, 0.2f));
+
+        ragdoll.link("Clavicle.L", 1f, new RangeOfMotion(0.6f, -0.3f, 0f, 0f, 0.4f, -0.4f));
+        ragdoll.link("Humerus.L", 1f, new RangeOfMotion(0.8f, -1.6f, 1f, -1f, 1f, -1.6f));
+        ragdoll.link("Ulna.L", 1f, new RangeOfMotion(0f, 0f, 1f, -1f, 2f, 0f));
+        ragdoll.link("Hand.L", 1f, new RangeOfMotion(0.8f, 0f, 0.2f));
+
+        ragdoll.link("Thigh.R", 1f, new RangeOfMotion(0.4f, -1f, 0.4f, -0.4f, 1f, -0.5f));
+        ragdoll.link("Calf.R", 1f, new RangeOfMotion(2f, 0f, 0f, 0f, 0f, 0f));
+        ragdoll.link("Foot.R", 1f, new RangeOfMotion(0.3f, 0.5f, 0f));
+
+        ragdoll.link("Thigh.L", 1f, new RangeOfMotion(0.4f, -1f, 0.4f, -0.4f, 0.5f, -1f));
+        ragdoll.link("Calf.L", 1f, new RangeOfMotion(2f, 0f, 0f, 0f, 0f, 0f));
+        ragdoll.link("Foot.L", 1f, new RangeOfMotion(0.3f, 0.5f, 0f));
+
+        model.addControl(ragdoll);
+
+        attachName(model, "Sinbad", 5f);
+        return model;
+    }
 }
