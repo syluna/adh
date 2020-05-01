@@ -169,9 +169,6 @@ public class AdhSample extends SimpleApplication {
             physicsState.getPhysicsSpace().add(player.getControl());
 
             physicsState.getPhysicsSpace().add(spider.getControl(BetterCharacterControl.class));
-
-            // physicsState.getPhysicsSpace().addAll(sinbad);
-            physicsState.getPhysicsSpace().add(sinbad.getControl(BetterCharacterControl.class));
             physicsState.getPhysicsSpace().add(sinbad.getControl(DynamicAnimControl.class));
         }
 
@@ -233,9 +230,6 @@ public class AdhSample extends SimpleApplication {
         AnimComposer composer = model.getControl(AnimComposer.class);
         composer.setCurrentAction("IdleTop");
 
-//        BetterCharacterControl betterCharacterControl = new BetterCharacterControl(0.5f, 3f, 20f);
-//        model.addControl(betterCharacterControl);
-
         DynamicAnimControl ragdoll = new DynamicAnimControl();
         LinkConfig hull = new LinkConfig(1f, MassHeuristic.Density, ShapeHeuristic.VertexHull, new Vector3f(1f, 1f, 1f),
                 CenterHeuristic.Mean, RotationOrder.XYZ);
@@ -267,4 +261,5 @@ public class AdhSample extends SimpleApplication {
         attachName(model, "Sinbad", 5f);
         return model;
     }
+
 }
