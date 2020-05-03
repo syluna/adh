@@ -70,7 +70,10 @@ dependencies {
 
     // get textures and sample to start working quickly
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.3.0-alpha2'
-    runtimeOnly group: 'com.github.nifty-gui', name: 'nifty-examples', version: '1.4.2' 
+        
+    implementation 'com.simsilica:lemur:1.13.0'
+    implementation 'com.simsilica:lemur-proto:1.11.0'
+	runtimeOnly "org.codehaus.groovy:groovy-all:2.4.5"
     
     implementation 'com.jayfella:jme-world-pager:1.0.1'
 }

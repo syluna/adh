@@ -7,9 +7,16 @@
 		</Console>
 	</Appenders>
 	<Loggers>
+		<Logger name="com.jme3" level="WARN" additivity="false">
+			<AppenderRef ref="console"/>
+		</Logger>
+		<Logger name="com.simsilica" level="WARN" additivity="false">
+			<AppenderRef ref="console"/>
+		</Logger>
+		
 
-            <Root level="INFO">
-		<AppenderRef ref="console"/>
-            </Root>
+		<Root level="INFO">
+			<AppenderRef ref="console"/>
+		</Root>
 	</Loggers>
 </Configuration>
