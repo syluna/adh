@@ -48,13 +48,14 @@ public class ChatState extends BaseAppState {
         TabbedPanel tabs = window.addChild(new TabbedPanel());
         tabs.setInsets(new Insets3f(5, 5, 5, 5));
 
+        LOGGER.info("Creating tabs");
         String mainChat = I18n.get("chat.tab.main.title");
         tabs.addTab(mainChat, createTabContents(mainChat));
         String systemChat = I18n.get("chat.tab.system.title");
         tabs.addTab(systemChat, createTabContents2(systemChat));
 
         // Centering window
-        applyStandardTransform(window);
+        WindowUtils.toBottomLeft(getApplication().getCamera(), window);
 
         initialized = true;
     }
@@ -124,15 +125,4 @@ public class ChatState extends BaseAppState {
         listBoxRef.get().add(message);
     }
 
-    private void applyStandardTransform(final Container container) {
-        int width = getApplication().getCamera().getWidth();
-        int height = getApplication().getCamera().getHeight();
-
-        // Apply standard scale
-        float standardScale = 1.2f * (height / 720f);
-        container.setLocalScale(standardScale);
-        Vector3f size = new Vector3f(container.getPreferredSize()).multLocal(standardScale);
-        // Centering window
-        container.setLocalTranslation((width - size.x) / 2, (height + size.y) / 2, 0);
-    }
 }

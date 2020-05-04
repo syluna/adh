@@ -122,7 +122,7 @@ public class LoginState extends BaseAppState {
         ((TbtQuadBackgroundComponent) cancelButton.getBackground()).setMargin(10, 5);
         window.addChild(buttonBox);
 
-        applyStandardTransform(window);
+        WindowUtils.toCenter(getApplication().getCamera(), window);
 
         initialized = true;
     }
@@ -179,23 +179,6 @@ public class LoginState extends BaseAppState {
             eyeButton.setIcon(EYE_ON_ICON);
             passwordField.setOutputCharacter('*');
         }
-    }
-
-    /**
-     * Apply standard scale and shift window to center
-     *
-     * @param container
-     */
-    private void applyStandardTransform(final Container container) {
-        int width = getApplication().getCamera().getWidth();
-        int height = getApplication().getCamera().getHeight();
-
-        // Apply standard scale
-        float standardScale = 1.2f * (height / 720f);
-        container.setLocalScale(standardScale);
-        Vector3f size = new Vector3f(container.getPreferredSize()).multLocal(standardScale);
-        // Centering window
-        container.setLocalTranslation((width - size.x) / 2, (height + size.y) / 2, 0);
     }
 
 }
