@@ -3,11 +3,27 @@ description = 'Adh'
 ext {
 	adhVersion='1.0.0-SNAPSHOT'
 	// Dependencies version
-	jmeVersion='3.3.2-stable'
-	minieVersion='1.6.1'
+    log4j2Version = '2.13.1'
+    lombokVersion = '1.18.12'
+    
+    minieVersion = '1.6.1'
 	
-    log4j2Version='2.13.1'
-    lombokVersion='1.18.12'
+	jmeVersion = '3.3.2-stable'
+	jmeModulesImpl = [
+            'jme3-core',
+            'jme3-desktop',
+            'jme3-effects',
+            'jme3-jogl',
+            'jme3-networking',
+            'jme3-terrain'
+    	]
+	jmeModulesRo = [
+		'jme3-lwjgl3',
+    	'jme3-blender',
+    	'jme3-jogg',
+    	'jme3-plugins'
+    	]
+
 }
 
 allprojects {

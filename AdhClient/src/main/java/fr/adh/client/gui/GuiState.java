@@ -3,8 +3,7 @@ package fr.adh.client.gui;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +59,7 @@ public class GuiState extends BaseAppState {
         }
     }
 
-    public void startGuiGame(@Nonnull String playerName, @Nonnull String message) {
+    public void startGuiGame(@NotNull String playerName, @NotNull String message) {
         LOGGER.info("[{}] successfuly login with message [{}].", playerName, message);
         close(LoginState.class);
         open(ChatState.class);

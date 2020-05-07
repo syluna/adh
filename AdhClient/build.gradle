@@ -42,39 +42,18 @@ dependencies {
     implementation 'com.github.stephengold:Minie:' + minieVersion
     implementation 'com.github.stephengold:Minie:' + minieVersion  + ':sources'
     
-    implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion + ':sources'
-    //implementation 'org.jmonkeyengine:jme3-bullet:' + jmeVersion
-    //implementation 'org.jmonkeyengine:jme3-bullet:' + jmeVersion + ':sources'
-    //runtimeOnly 'org.jmonkeyengine:jme3-bullet-native:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-desktop:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-desktop:' + jmeVersion + ':sources'
-    implementation 'org.jmonkeyengine:jme3-effects:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-effects:' + jmeVersion + ':sources'
-    implementation 'org.jmonkeyengine:jme3-jogl:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-jogl:' + jmeVersion + ':sources'
-    implementation 'org.jmonkeyengine:jme3-networking:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-networking:' + jmeVersion + ':sources'
-    implementation 'org.jmonkeyengine:jme3-niftygui:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-niftygui:' + jmeVersion + ':sources'
-    implementation 'org.jmonkeyengine:jme3-terrain:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-terrain:' + jmeVersion + ':sources'
-    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmeVersion
-    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmeVersion  + ':sources'
-    runtimeOnly 'org.jmonkeyengine:jme3-blender:' + jmeVersion
-    runtimeOnly 'org.jmonkeyengine:jme3-blender:' + jmeVersion + ':sources'
-    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jmeVersion
-    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jmeVersion + ':sources'
-    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jmeVersion
-    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jmeVersion + ':sources'
-
+    jmeModulesImpl.each { implementationModule ->
+		implementation "org.jmonkeyengine:$implementationModule:${jmeVersion}"
+		implementation "org.jmonkeyengine:$implementationModule:${jmeVersion}:sources"
+    }
+    jmeModulesRo.each { runtimeModule ->
+		runtimeOnly "org.jmonkeyengine:$runtimeModule:${jmeVersion}"
+    }
+    
     // get textures and sample to start working quickly
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.3.0-alpha2'
     
     // For True Type Font
-    //implementation 'com.jaredrummler:sfntly:1.0.1'
-    //implementation 'org.jmonkeyengine:jme3-android:' + jmeVersion
-    //compileOnly 'com.google.android:android:[4.1,)'
     implementation 'com.atr:jme-ttf:2.2.2'
     
     // For GUI
