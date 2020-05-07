@@ -1,0 +1,34 @@
+MaterialDef PerlinClouds {
+
+    MaterialParameters {
+
+        Color Color
+        Texture2D Noise
+        Float Scale
+        Vector2 Speed
+        Float Cover
+        Float Brightness
+        Float MorphSpeed
+        Float MorphDirection
+        // Boolean Reverse
+    }
+
+    Technique {
+
+        VertexShader GLSL150:   MatDefs/Clouds/NoiseClouds.vert
+        FragmentShader GLSL150: MatDefs/Clouds/NoiseClouds.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+            ViewProjectionMatrix
+            NormalMatrix
+            WorldViewMatrix
+            ViewMatrix
+            CameraPosition
+            WorldMatrix
+            Time
+        }
+
+    }
+
+}

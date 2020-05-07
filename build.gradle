@@ -24,6 +24,7 @@ allprojects {
 		mavenCentral()
 		maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
 		maven { url 'https://jitpack.io' }
+		maven { url 'https://mvnrepository.com/artifact/com.jaredrummler/sfntly' }
     }
 	
     dependencies {

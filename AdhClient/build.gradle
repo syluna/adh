@@ -70,10 +70,18 @@ dependencies {
 
     // get textures and sample to start working quickly
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.3.0-alpha2'
-        
+    
+    // For True Type Font
+    //implementation 'com.jaredrummler:sfntly:1.0.1'
+    //implementation 'org.jmonkeyengine:jme3-android:' + jmeVersion
+    //compileOnly 'com.google.android:android:[4.1,)'
+    implementation 'com.atr:jme-ttf:2.2.2'
+    
+    // For GUI
     implementation 'com.simsilica:lemur:1.13.0'
     implementation 'com.simsilica:lemur-proto:1.11.0'
-	runtimeOnly "org.codehaus.groovy:groovy-all:2.4.5"
+	runtimeOnly 'org.codehaus.groovy:groovy-all:3.0.3'
+	compileOnly 'org.jetbrains:annotations:19.0.0'
     
     implementation 'com.jayfella:jme-world-pager:1.0.1'
 }

@@ -3,8 +3,15 @@ package fr.adh.client.gui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.atr.jme.font.TrueTypeFont;
+import com.atr.jme.font.asset.TrueTypeKey;
+import com.atr.jme.font.asset.TrueTypeKeyBMP;
+import com.atr.jme.font.asset.TrueTypeLoader;
+import com.atr.jme.font.shape.TrueTypeNode;
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.BaseAppState;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.simsilica.lemur.ActionButton;
 import com.simsilica.lemur.Axis;
@@ -52,9 +59,18 @@ public class LoginState extends BaseAppState {
 
     private VersionedReference<DocumentModel> loginFieldRef;
     private VersionedReference<DocumentModel> passwordFieldRef;
+    private TrueTypeNode text;
 
     @Override
     protected void initialize(final Application application) {
+        application.getAssetManager().registerLoader(TrueTypeLoader.class, "ttf");
+        TrueTypeKey key = new TrueTypeKeyBMP("Interface/Fonts/t4cbeaulieux.ttf", com.atr.jme.font.util.Style.Plain, 40);
+        TrueTypeFont ttf = (TrueTypeFont) application.getAssetManager().loadAsset(key);
+        text = ttf.getText("L'Aube des Héros", 1, ColorRGBA.White);
+        text.setLocalTranslation((application.getCamera().getWidth() - text.getWidth()) / 2,
+                5 * (application.getCamera().getHeight() / 6), 0);
+        ((SimpleApplication) application).getGuiNode().attachChild(text);
+
         window = new Container();
         Label titleLabel = window.addChild(new Label(I18n.get("login.title")));
         titleLabel.setInsets(new Insets3f(10, 5, 5, 5));
@@ -158,6 +174,7 @@ public class LoginState extends BaseAppState {
             return;
         }
         window.removeFromParent();
+        text.removeFromParent();
     }
 
     protected void login() {

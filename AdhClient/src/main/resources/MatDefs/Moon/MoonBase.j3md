@@ -1,0 +1,20 @@
+MaterialDef My MaterialDef {
+
+    MaterialParameters {
+        Texture2D MoonTex
+        Texture2D Noise : Textures/Noise/WhiteNoise.png
+        Float Phase
+    }
+
+    Technique {
+        VertexShader GLSL100:   MatDefs/Moon/MoonBase.vert
+        FragmentShader GLSL100: MatDefs/Moon/MoonBase.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+            Time
+            Resolution
+        }
+    }
+
+}

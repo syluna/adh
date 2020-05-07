@@ -7,23 +7,30 @@ import org.slf4j.LoggerFactory;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;
+import com.jme3.input.KeyInput;
 import com.jme3.math.Vector3f;
-import com.simsilica.lemur.ActionButton;
-import com.simsilica.lemur.CallMethodAction;
+import com.simsilica.lemur.Axis;
 import com.simsilica.lemur.Container;
+import com.simsilica.lemur.FillMode;
 import com.simsilica.lemur.Insets3f;
 import com.simsilica.lemur.Label;
 import com.simsilica.lemur.ListBox;
 import com.simsilica.lemur.RangedValueModel;
 import com.simsilica.lemur.TabbedPanel;
+import com.simsilica.lemur.TextField;
+import com.simsilica.lemur.VAlignment;
+import com.simsilica.lemur.component.SpringGridLayout;
+import com.simsilica.lemur.component.TextEntryComponent;
 import com.simsilica.lemur.core.VersionedReference;
 import com.simsilica.lemur.event.ConsumingMouseListener;
 import com.simsilica.lemur.event.CursorEventControl;
-import com.simsilica.lemur.event.DragHandler;
+import com.simsilica.lemur.event.KeyAction;
 import com.simsilica.lemur.event.MouseEventControl;
+import com.simsilica.lemur.text.DocumentModelFilter;
 
 import fr.adh.client.AdhClient;
 import fr.adh.client.I18n;
+import fr.adh.client.gui.handler.ClampDragHandler;
 
 public class ChatState extends BaseAppState {
 
@@ -34,23 +41,25 @@ public class ChatState extends BaseAppState {
     private boolean autoscroll = false;
 
     private Container window;
+    private Container windowTitle;
+
     private ListBox<String> listBoxField;
     private VersionedReference<List<String>> listBoxRef;
+
+    ClampDragHandler eventHandler;
 
     @Override
     protected void initialize(final Application application) {
         window = new Container();
-        window.addChild(new Label("Tchat de Jérôme qui fait des tests"));
+        windowTitle = window.addChild(new Container());
+        windowTitle.addChild(new Label("Tchat de Jérôme qui fait des tests"));
 
-        CursorEventControl.addListenersToSpatial(window, new DragHandler());
-        MouseEventControl.addListenersToSpatial(window, ConsumingMouseListener.INSTANCE);
-
+        eventHandler = new ClampDragHandler(true);
+        // CursorEventControl.addListenersToSpatial(window, new DragHandler());
         TabbedPanel tabs = window.addChild(new TabbedPanel());
         tabs.setInsets(new Insets3f(5, 5, 5, 5));
 
-        LOGGER.info("Creating tabs");
-        String mainChat = I18n.get("chat.tab.main.title");
-        tabs.addTab(mainChat, createTabContents(mainChat));
+        tabs.addTab(I18n.get("chat.tab.main.title"), createTabContents());
         String systemChat = I18n.get("chat.tab.system.title");
         tabs.addTab(systemChat, createTabContents2(systemChat));
 
@@ -70,8 +79,10 @@ public class ChatState extends BaseAppState {
         if (!initialized) {
             return;
         }
+        CursorEventControl.addListenersToSpatial(windowTitle, eventHandler);
+        MouseEventControl.addListenersToSpatial(window, ConsumingMouseListener.INSTANCE);
+
         ((AdhClient) getApplication()).getGuiNode().attachChild(window);
-        // GuiGlobals.getInstance().requestFocus(window);
     }
 
     @Override
@@ -79,6 +90,9 @@ public class ChatState extends BaseAppState {
         if (!initialized) {
             return;
         }
+        CursorEventControl.removeListenersFromSpatial(windowTitle, eventHandler);
+        MouseEventControl.removeListenersFromSpatial(window, ConsumingMouseListener.INSTANCE);
+
         window.removeFromParent();
     }
 
@@ -102,23 +116,32 @@ public class ChatState extends BaseAppState {
         return contents;
     }
 
-    private Container createTabContents(String name) {
+    private Container createTabContents() {
         Container contents = new Container();
 
         listBoxField = contents.addChild(new ListBox<String>());
         listBoxRef = listBoxField.getModel().createReference();
-        listBoxField.setPreferredSize(new Vector3f(300f, 200f, 0f));
-        listBoxField.setVisibleItems(9);
+        listBoxField.setPreferredSize(new Vector3f(300f, 110f, 0f));
+        listBoxField.setVisibleItems(5);
 
         listBoxField.getSlider().getModel().setValue(0.0);
 
-        // TODO Add input text field and send button
-        contents.addChild(new ActionButton(new CallMethodAction(">", this, "addItem")));
-        return contents;
-    }
+        Container inputContents = contents
+                .addChild(new Container(new SpringGridLayout(Axis.Y, Axis.X, FillMode.First, FillMode.First)));
 
-    protected void addItem() {
-        addMessage("Item " + listBoxRef.get().size());
+        TextField textField = inputContents.addChild(new TextField(new DocumentModelFilter()), 0, 0);
+        textField.setPreferredWidth(200);
+        textField.setTextVAlignment(VAlignment.Center);
+        textField.setInsets(new Insets3f(3, 3, 3, 3));
+        textField.getActionMap().put(new KeyAction(KeyInput.KEY_RETURN), (TextEntryComponent source, KeyAction key) -> {
+            String entry = source.getDocumentModel().getText().trim();
+            if (!"".contentEquals(entry)) {
+                AdhClient.getInstance().sendMessage(entry);
+                source.getDocumentModel().setText("");
+            }
+        });
+
+        return contents;
     }
 
     public void addMessage(final String message) {

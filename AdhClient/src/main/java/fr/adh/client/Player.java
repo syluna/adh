@@ -1,5 +1,6 @@
 package fr.adh.client;
 
+import com.jme3.anim.AnimComposer;
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.font.BitmapFont;
@@ -15,61 +16,65 @@ import lombok.Getter;
 
 public class Player {
 
-	@Getter
-	private Node model;
+    @Getter
+    private Node node;
 
-	public Player(final AssetManager assetManager, Vector3f spawnPoint, String name) {
-		BetterCharacterControl playerControl = new BetterCharacterControl(1f, 5f, 1f);
-		playerControl.setGravity(new Vector3f(0f, -9.81f, 0f));
-		model = (Node) assetManager.loadModel("Models/Ninja/Ninja.mesh.xml");
-		model.scale(0.02f, 0.02f, 0.02f);
-		model.setLocalTranslation(spawnPoint);
-		model.addControl(playerControl);
+    public Player(final AssetManager assetManager, Vector3f spawnPoint, String name) {
+        node = (Node) assetManager.loadModel("Models/Ninja/Ninja.j3o");
+        node.setLocalScale(0.02f, 0.02f, 0.02f);
+        node.setLocalTranslation(spawnPoint);
 
-		setLocation(spawnPoint);
+        BetterCharacterControl playerControl = new BetterCharacterControl(0.8f, 3.8f, 1f);
+        node.addControl(playerControl);
 
-		if ("Player".equalsIgnoreCase(name)) {
-			return;
-		}
-		BitmapText hudText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
-		hudText.setSize(0.5f);
-		hudText.setColor(new ColorRGBA(0, 1, 1, 1));
-		hudText.setText(name);
+        AnimComposer animComposer = node.getControl(AnimComposer.class);
+        // animComposer.getAnimClips().forEach(animClip -> LOGGER.info("Player AnimClip
+        // name [{}].", animClip.getName()));
+        animComposer.setCurrentAction("Idle2");
 
-		// hudText.setLocalTranslation(cam.getScreenCoordinates(playerNode.getLocalTranslation().add(-0.5f,
-		// 3f, 0f)));
-		float textWidth = hudText.getLineWidth() + 20;
-		float textOffset = textWidth / 2;
-		hudText.setBox(new Rectangle(-textOffset, 0, textWidth, hudText.getHeight()));
-		hudText.setAlignment(BitmapFont.Align.Center);
-		hudText.setQueueBucket(RenderQueue.Bucket.Transparent);
-		BillboardControl bc = new BillboardControl();
-		bc.setAlignment(BillboardControl.Alignment.Screen);
-		hudText.addControl(bc);
+        if ("Player".equalsIgnoreCase(name)) {
+            return;
+        }
 
-		Node textNode = new Node("LabelNode");
-		textNode.setLocalTranslation(0, 2.6f + hudText.getHeight(), 0);
-		textNode.attachChild(hudText);
-		model.attachChild(textNode);
-	}
+        BitmapText hudText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+        hudText.setSize(0.5f);
+        hudText.setColor(new ColorRGBA(0, 1, 1, 1));
+        hudText.setText(name);
 
-	public Player(final AssetManager assetManager, Vector3f spawnPoint) {
-		this(assetManager, spawnPoint, "Player");
-	}
+        // hudText.setLocalTranslation(cam.getScreenCoordinates(playerNode.getLocalTranslation().add(-0.5f,
+        // 3f, 0f)));
+        float textWidth = hudText.getLineWidth() + 20;
+        float textOffset = textWidth / 2;
+        hudText.setBox(new Rectangle(-textOffset, 0, textWidth, hudText.getHeight()));
+        hudText.setAlignment(BitmapFont.Align.Center);
+        hudText.setQueueBucket(RenderQueue.Bucket.Transparent);
+        BillboardControl bc = new BillboardControl();
+        bc.setAlignment(BillboardControl.Alignment.Screen);
+        hudText.addControl(bc);
 
-	public BetterCharacterControl getControl() {
-		return model.getControl(BetterCharacterControl.class);
-	}
+        Node textNode = new Node("LabelNode");
+        textNode.setLocalTranslation(0, 2.6f + hudText.getHeight(), 0);
+        textNode.attachChild(hudText);
+        node.attachChild(textNode);
+    }
 
-	public void remove() {
-		model.removeFromParent();
-	}
+    public Player(final AssetManager assetManager, Vector3f spawnPoint) {
+        this(assetManager, spawnPoint, "Player");
+    }
 
-	public void setLocation(final Vector3f location) {
-		getControl().warp(location);
-	}
+    public BetterCharacterControl getControl() {
+        return node.getControl(BetterCharacterControl.class);
+    }
 
-	public Vector3f getLocation() {
-		return model.getLocalTranslation();
-	}
+    public void remove() {
+        node.removeFromParent();
+    }
+
+    public void setLocation(final Vector3f location) {
+        getControl().warp(location);
+    }
+
+    public Vector3f getLocation() {
+        return node.getLocalTranslation();
+    }
 }

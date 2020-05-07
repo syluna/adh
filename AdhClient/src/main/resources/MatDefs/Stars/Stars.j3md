@@ -1,0 +1,43 @@
+MaterialDef Stars {
+
+    MaterialParameters {
+
+        // we'll have 4 layers of stars. One for each primary color, and one for standard grey.
+
+        Vector3 Stars_0; // Vector3(amount, brightness, size)
+        Color Color_0;
+        Vector2 Speed_0;
+
+        Vector3 Stars_1; // Vector3(amount, brightness, size)
+        Color Color_1;
+        Vector2 Speed_1;
+
+        Vector3 Stars_2; // Vector3(amount, brightness, size)
+        Color Color_2;
+        Vector2 Speed_2;
+
+        Vector3 Stars_3; // Vector3(amount, brightness, size)
+        Color Color_3;
+        Vector2 Speed_3;
+
+    }
+
+    Technique {
+
+        VertexShader GLSL150:   MatDefs/Stars/Stars.vert
+        FragmentShader GLSL150: MatDefs/Stars/Stars.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+            ViewProjectionMatrix
+            NormalMatrix
+            WorldViewMatrix
+            ViewMatrix
+            CameraPosition
+            WorldMatrix
+            Time
+        }
+
+    }
+
+}

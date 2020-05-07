@@ -9,17 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import com.jayfella.jme.atmosphere.NewAtmosphereState;
 import com.jayfella.jme.worldpager.world.WorldSettings;
 import com.jme3.app.ChaseCameraAppState;
 import com.jme3.app.SimpleApplication;
+import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.BulletAppState.ThreadingType;
 import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
-import com.jme3.light.AmbientLight;
-import com.jme3.light.DirectionalLight;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.network.Client;
@@ -42,11 +40,13 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdhClient.class);
 
-    private static final Vector3f SPAWN_POINT = new Vector3f(0f, 150f, 0f);
-    private final Vector3f lightDir = new Vector3f(-0.1f, -0.1f, -0.1f);
+    private static final Vector3f SPAWN_POINT = new Vector3f(0f, 15f, 0f);
 
     private AdhWorldState adhWorldState;
     private AdhWaterState adhWaterState;
+    private NewAtmosphereState atmosphereState;
+
+    private BulletAppState physicsState;
 
     private Client client;
     private String playerName;
@@ -63,7 +63,9 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
             rightRotate = false;
     @Setter
     private boolean inputEnable = true;
+
     private boolean isReady = false;
+    private boolean isInitialized = false;
 
     private static AdhClient adhClient;
 
@@ -104,34 +106,32 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
     }
 
     public void initLandscape(String playerName) {
+        // Physics
+        physicsState = new BulletAppState();
+        physicsState.setThreadingType(ThreadingType.PARALLEL);
+        // physicsState.setDebugEnabled(true);
+        stateManager.attach(physicsState);
+
         WorldSettings worldSettings = new WorldSettings();
         worldSettings.setWorldName("Adh World");
         worldSettings.setSeed(123);
         worldSettings.setNumThreads(3);
 
-        adhWorldState = new AdhWorldState(worldSettings);
+        adhWorldState = new AdhWorldState(worldSettings, physicsState.getPhysicsSpace());
         stateManager.attach(adhWorldState);
-        stateManager.attach(adhWorldState.getBulletAppState());
-        rootNode.attachChild(adhWorldState.getWorldNode());
-
-        adhWorldState.getBulletAppState().setDebugEnabled(true);
-
-        adhWaterState = new AdhWaterState(lightDir);
-        stateManager.attach(adhWaterState);
 
         player = new Player(assetManager, SPAWN_POINT, playerName);
-        rootNode.attachChild(player.getModel());
-        adhWorldState.getBulletAppState().getPhysicsSpace().add(player.getControl());
+        rootNode.attachChild(player.getNode());
         attachCamera(player);
 
-        // Temporarly
-        DirectionalLight sun = new DirectionalLight();
-        sun.setDirection(lightDir.normalize());
-        sun.setColor(ColorRGBA.White.clone().multLocal(1f));
-        rootNode.addLight(sun);
-        AmbientLight al = new AmbientLight();
-        al.setColor(ColorRGBA.White);
-        rootNode.addLight(al);
+        atmosphereState = new NewAtmosphereState(adhWorldState.getWorldNode());
+        stateManager.attach(atmosphereState);
+
+        adhWaterState = new AdhWaterState(atmosphereState.getDirectionalLight());
+        stateManager.attach(adhWaterState);
+
+        rootNode.addLight(atmosphereState.getDirectionalLight());
+        rootNode.addLight(atmosphereState.getAmbientLight());
 
         setupKeys();
 
@@ -154,11 +154,15 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
         if (!isReady) {
             return;
         }
-
-        if (inputEnable) {
+        if (!isInitialized && adhWorldState.isReady()) {
+            isInitialized = true;
+            physicsState.getPhysicsSpace().addAll(player.getNode());
+            physicsState.getPhysicsSpace().add(player.getControl());
+        }
+        if (isInitialized && inputEnable) {
             // View player camera
-            Vector3f camDir = cam.getDirection().mult(0.2f);
-            Vector3f camLeft = cam.getLeft().mult(0.2f);
+            Vector3f camDir = cam.getDirection().mult(5.6f);
+            Vector3f camLeft = cam.getLeft().mult(5.6f);
             camDir.y = 0;
             camLeft.y = 0;
             viewDirection.set(camDir);
@@ -183,8 +187,7 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
         }
 
         adhWorldState.setFollower(player.getLocation());
-        adhWorldState.update(tpf);
-        adhWaterState.update(tpf);
+        atmosphereState.setLocation(cam.getLocation());
     }
 
     @Override
@@ -236,8 +239,8 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
 
     public void addEntity(int idEntity) {
         Player entity = new Player(assetManager, SPAWN_POINT);
-        adhWorldState.getBulletAppState().getPhysicsSpace().add(entity.getControl());
-        entitiesNode.attachChild(entity.getModel());
+        physicsState.getPhysicsSpace().add(entity.getControl());
+        entitiesNode.attachChild(entity.getNode());
         entities.put(idEntity, entity);
     }
 
@@ -246,14 +249,14 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
         if (entity == null) {
             return;
         }
-        entitiesNode.detachChild(entity.getModel());
-        adhWorldState.getBulletAppState().getPhysicsSpace().remove(entity.getControl());
+        entitiesNode.detachChild(entity.getNode());
+        physicsState.getPhysicsSpace().remove(entity.getControl());
         entities.remove(idEntity);
     }
 
     public void attachCamera(final Player player) {
         ChaseCameraAppState chaseCam = new ChaseCameraAppState();
-        chaseCam.setTarget(player.getModel());
+        chaseCam.setTarget(player.getNode());
         stateManager.attach(chaseCam);
         chaseCam.setInvertHorizontalAxis(true);
         chaseCam.setInvertVerticalAxis(true);
@@ -263,7 +266,7 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
         chaseCam.setDefaultDistance(10);
         chaseCam.setMinDistance(0.01f);
         chaseCam.setMaxDistance(20f);
-        chaseCam.setZoomSpeed(0.1f);
+        chaseCam.setZoomSpeed(3f);
         chaseCam.setDefaultVerticalRotation(0.3f);
     }
 
@@ -275,7 +278,6 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
         inputManager.addMapping("Walk Forward", new KeyTrigger(KeyInput.KEY_W), new KeyTrigger(KeyInput.KEY_UP));
         inputManager.addMapping("Walk Backward", new KeyTrigger(KeyInput.KEY_S), new KeyTrigger(KeyInput.KEY_DOWN));
         inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addMapping("Shoot", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addListener(this, "Strafe Left", "Strafe Right");
         inputManager.addListener(this, "Rotate Left", "Rotate Right");
         inputManager.addListener(this, "Walk Forward", "Walk Backward");
@@ -288,7 +290,6 @@ public class AdhClient extends SimpleApplication implements ClientStateListener,
             LOGGER.warn("Input disabled!!!");
             return;
         }
-        LOGGER.info("binding [{}] with value [{}]", binding, value);
         switch (binding) {
         case "Strafe Left":
             leftStrafe = value;
